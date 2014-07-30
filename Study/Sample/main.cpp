@@ -14,7 +14,7 @@ template<typename _DataType> void inverse(_DataType pBegin, _DataType pEnd)
 	assert(pBegin != NULL);
 	assert(pEnd != NULL);
 	assert(pBegin <= pEnd);
-	while(pBegin <= pEnd)
+	while(pBegin < pEnd)
 	{
 		swap(*pBegin, *pEnd);
 		++pBegin;
