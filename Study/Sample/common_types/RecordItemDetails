@@ -7,6 +7,7 @@ public class RecordItemDetails
 	public static int nDay;
 	public static int nHour;
 	public static int nMinute;
+	public static boolean bPay;
 	public static String strMember;
 	public static String strRemark;
 	public static BillTypes eBillType;
@@ -20,6 +21,7 @@ public class RecordItemDetails
 		nDay = 0;
 		nHour = -1;
 		nMinute = -1;
+		bPay = true;
 		strMember = new String();
 		strRemark = new String();
 		eBillType = new BillTypes();
@@ -36,6 +38,7 @@ public class RecordItemDetails
 		nMinute = other.nMinute;
 		strMember = other.strMember;
 		strRemark = other.strRemark;
+		bPay = other.bPay;
 		eBillType.strName = other.eBillType.strName;
 		eWalletType.strName = other.eWalletType.strName;
 		eWalletType.strType = other.eWalletType.strType;
