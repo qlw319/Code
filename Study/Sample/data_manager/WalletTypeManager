@@ -1,0 +1,51 @@
+package project.mynotepad.data_manager;
+
+import java.util.ArrayList;
+
+import project.mynotepad.common_type.WalletTypes;
+import project.mynotepad.datastructs.ControlCenter;
+
+public class WalletTypeManager
+{
+	public static boolean ChangeName(int nIndex, String strNewName)
+	{
+		return true;
+	}
+
+	public static boolean ChangeBackgroundColor(int nIndex, String strNewColor)
+	{
+		return true;
+	}
+
+	public static boolean DeleteSpecifiedType(int nIndex)
+	{
+		return true;
+	}
+
+	public static boolean AddNewType(WalletTypes eNewWalletTypes)
+	{
+		if(GetIndexByNameAndType(eNewWalletTypes.strName, eNewWalletTypes.strType) != -1)
+			return false;
+
+		return true;
+	}
+
+	public static int GetIndexByNameAndType(String strName, String strType)
+	{
+		ArrayList<WalletTypes> arrayList = ControlCenter.GetWalletTypes();
+		if(arrayList == null)
+			return -1;
+
+		int nIndex = -1;
+		for(int i = 0; i < arrayList.size(); ++i)
+		{
+			if(strName == arrayList.get(i).strName && strType == arrayList.get(i).strType)
+			{
+				nIndex = i;
+				break;
+			}
+		}
+
+		return nIndex;
+	}
+}
