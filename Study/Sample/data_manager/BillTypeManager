@@ -1,0 +1,33 @@
+package project.mynotepad.data_manager;
+
+import java.util.ArrayList;
+
+import project.mynotepad.common_type.BillTypes;
+
+public class BillTypeManager
+{
+	public static boolean LoadBillType(ArrayList<BillTypes> arrBillTypeList)
+	{
+		return true;
+	}
+
+	public static boolean ChangeName(int nIndex, String strNewName)
+	{
+		return true;
+	}
+
+	public static boolean ChangePicture(int nIndex, String strNewPicture)
+	{
+		return true;
+	}
+
+	public static boolean ModifyType(int nIndex, String strNewName, String strNewPicture)
+	{
+		return true;
+	}
+
+	public static boolean AddType(BillTypes eNewBillType)
+	{
+		return true;
+	}
+}
