@@ -1,0 +1,11 @@
+package project.mynotepad.common_type;
+
+public class MemberType
+{
+	public static String strName;
+
+	public MemberType()
+	{
+		strName = new String();
+	}
+}
