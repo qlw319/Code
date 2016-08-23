@@ -1,0 +1,25 @@
+package project.mynotepad.common_type;
+
+public class WalletTypes
+{
+	public static String strName;
+	public static String strType;
+	public static int nColorIndex;
+
+	public static String[] AccoutTypes = new String[]{
+			"现金",
+			"储蓄卡",
+			"信用卡",
+			"网络账户",
+			"投资账户",
+			"应收款",
+			"应付款"
+	};
+
+	public WalletTypes()
+	{
+		strName = new String();
+		strType = new String();
+		nColorIndex = -1;
+	}
+}
