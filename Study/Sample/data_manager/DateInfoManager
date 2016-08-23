@@ -109,6 +109,30 @@ public class DateInforManager
 
 		dateInformation.dPay -= item.dPayMoney;
 		dateInformation.dIncome -= item.dIncomeMoney;
+		OrderDateInformation();
+		return true;
+	}
+
+	public static boolean ModifySingleRecordItem(RecordItemDetails itemBefore, RecordItemDetails itemAfter)
+	{
+		ArrayList<DateInformation> arrDateInfoList = ControlCenter.GetDateInfo();
+		if(arrDateInfoList == null)
+			return false;
+
+		DateInformation dateInformation = GetDateInforByDate(itemBefore.nYear, itemBefore.nMonth, itemBefore.nDay);
+		if(dateInformation == null)
+			return false;
+
+		if(itemAfter.nYear == itemBefore.nYear && itemAfter.nMonth == itemBefore.nMonth && itemAfter.nDay == itemBefore.nDay)
+		{
+			dateInformation.dPay += itemAfter.dPayMoney - itemBefore.dPayMoney;
+			dateInformation.dIncome += itemAfter.dIncomeMoney - itemBefore.dIncomeMoney;
+		}
+		else
+		{
+			DeleteSingleRecordItem(itemBefore);
+			AddSingleRecordItem(itemAfter);
+		}
 
 		return true;
 	}
@@ -126,6 +150,9 @@ public class DateInforManager
 			if(tmp.dPay <= 0 && tmp.dIncome <= 0)
 				arrDateInfoList.remove(i);
 		}
+
+		// 排序
+		QuickSort(arrDateInfoList, 0, arrDateInfoList.size() - 1);
 	}
 
 	public static DateInformation GetDateInforByDate(int nYear, int nMonth, int nDay)
@@ -167,5 +194,57 @@ public class DateInforManager
 		}
 
 		return moneyChange;
+	}
+
+	// 对数据库中加载出来的数据进行快速排序，排序是按时间从前到后排列
+	private static void QuickSort(ArrayList<DateInformation> compare, int left, int right)
+	{
+		int dp;
+		if(left < right)
+		{
+			dp = Partition(compare, left, right);
+			QuickSort(compare, left, dp - 1);
+			QuickSort(compare, dp + 1, right);
+		}
+	}
+
+	// 快速排序中需要用到的划分边界的函数
+	private static int Partition(ArrayList<DateInformation> arrItemsList, int left, int right)
+	{
+		DateInformation pivot = arrItemsList.get(left);
+		while(left < right)
+		{
+			while(left < right && DateTimeCompare(arrItemsList.get(right), pivot))
+				right--;
+			if(left < right)
+				arrItemsList.get(left++).Instead(arrItemsList.get(right));
+			while(left < right && DateTimeCompare(arrItemsList.get(left), pivot))
+				left++;
+			if(left < right)
+				arrItemsList.get(right--).Instead(arrItemsList.get(left));
+		}
+		arrItemsList.get(left).Instead(pivot);
+		return left;
+	}
+
+	// 决定详细数据排列的方式，按时间的从最近到最久的顺序
+	private static boolean DateTimeCompare(DateInformation first, DateInformation second)
+	{
+		if(first.nYear > second.nYear)
+			return true;
+		else if(second.nYear > first.nYear)
+			return false;
+
+		if(first.nMonth > second.nMonth)
+			return true;
+		else if(second.nMonth > first.nMonth)
+			return false;
+
+		if(first.nDay > second.nDay)
+			return true;
+		else if(second.nDay > first.nDay)
+			return false;
+
+		return true;
 	}
 }
