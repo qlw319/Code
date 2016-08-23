@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.ArrayList;
 
 import project.mynotepad.common_type.BillTypes;
+import project.mynotepad.common_type.DateInformation;
 import project.mynotepad.common_type.MemberType;
 import project.mynotepad.common_type.RecordItemDetails;
 import project.mynotepad.common_type.WalletTypes;
@@ -17,6 +18,7 @@ public class ControlCenter
 	private static ArrayList<WalletTypes> m_arrWalletTypes = null;
 	private static ArrayList<BillTypes> m_arrBillTypes = null;
 	private static ArrayList<RecordItemDetails> m_arrRecordItemDetails;
+	private static ArrayList<DateInformation> m_arrDateInformation;
 
 	public static boolean Initialization(Context context)
 	{
@@ -63,5 +65,10 @@ public class ControlCenter
 	public static ArrayList<RecordItemDetails> GetRecordItemDetails()
 	{
 		return m_arrRecordItemDetails;
+	}
+
+	public static ArrayList<DateInformation> GetDateInfo()
+	{
+		return m_arrDateInformation;
 	}
 }
