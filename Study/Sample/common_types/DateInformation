@@ -1,0 +1,19 @@
+package project.mynotepad.common_type;
+
+public class DateInformation
+{
+	public static int nYear;
+	public static int nMonth;
+	public static int nDay;
+	public static double dPay;
+	public static double dIncome;
+
+	public DateInformation()
+	{
+		nYear = 0;
+		nMonth = 0;
+		nDay = 0;
+		dPay = 0;
+		dIncome = 0;
+	}
+}
