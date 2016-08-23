@@ -2,36 +2,111 @@ package project.mynotepad.data_manager;
 
 import java.util.ArrayList;
 
+import project.mynotepad.common_type.IncomeAndPay;
 import project.mynotepad.common_type.RecordItemDetails;
 import project.mynotepad.datastructs.ControlCenter;
 
+import static project.mynotepad.data_manager.DateInforManager.GetSpecifyDayIncomeAndPay;
+
 public class RecordItemDetailManager
 {
+	// 从数据库中把数据导入内存
 	public static boolean LoadRecordItem(ArrayList<RecordItemDetails> arrRecordItemDetailsList)
 	{
 		return true;
 	}
 
+	// 增加一条记录
 	public static boolean AddRecordItem(RecordItemDetails eNewItem)
 	{
 		return true;
 	}
 
+	// 删除一条记录
 	public static boolean DeleteRecordItem(RecordItemDetails eItem)
 	{
 		return true;
 	}
 
+	// 修改一条记录
 	public static boolean ModifyRecordItem(RecordItemDetails eItemBefore, RecordItemDetails eItemModify)
 	{
 		return true;
 	}
 
-	public static ArrayList<RecordItemDetails> GetSpecifiedDayList()
+	// 获取每一天记录列表
+	public static ArrayList<RecordItemDetails> GetSpecifiedDayList(int nYear, int nMonth, int nDay)
 	{
-		ArrayList<RecordItemDetails> arrayList = new ArrayList<>();
+		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
+		if(arrAllRecordList == null)
+			return null;
 
-		return arrayList;
+		ArrayList<RecordItemDetails> arrDayList = new ArrayList<>();
+		for(int i = 0; i < arrAllRecordList.size(); ++i)
+		{
+			RecordItemDetails tmp = arrAllRecordList.get(i);
+			if(tmp.nYear != nYear || tmp.nMonth != nMonth || tmp.nDay != nDay)
+				continue;
+
+			RecordItemDetails item = new RecordItemDetails();
+			item.Instead(tmp);
+			// 这个地方有可能错了，因为我们需要的是尾插法
+			arrDayList.add(item);
+		}
+
+		return arrDayList;
+	}
+
+	// 获得时光轴所需样式的记录
+	public static ArrayList<RecordItemDetails> GetTimeLineRecordType()
+	{
+		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
+		if(arrAllRecordList == null)
+			return null;
+
+		ArrayList<RecordItemDetails> arrTimeLineRecordList = new ArrayList<>();
+		int nLastRecordYear = 0;
+		int nLastRecordMonth = 0;
+		int nLastRecordDay = 0;
+		for(int i = 0; i < arrAllRecordList.size(); ++i)
+		{
+			RecordItemDetails tmp = arrAllRecordList.get(i);
+
+			if(tmp.nYear != nLastRecordYear)
+			{
+				RecordItemDetails item = new RecordItemDetails();
+				item.nYear = tmp.nYear;
+				item.nMonth = tmp.nMonth;
+				arrTimeLineRecordList.add(item);
+				nLastRecordYear = tmp.nYear;
+				nLastRecordMonth = tmp.nMonth;
+			}
+			else if(tmp.nMonth != nLastRecordMonth)
+			{
+				RecordItemDetails item = new RecordItemDetails();
+				item.nMonth = tmp.nMonth;
+				arrTimeLineRecordList.add(item);
+				nLastRecordMonth = tmp.nMonth;
+			}
+
+			if(tmp.nDay != nLastRecordDay)
+			{
+				RecordItemDetails item = new RecordItemDetails();
+				item.nDay = tmp.nDay;
+				IncomeAndPay moneyChange = GetSpecifyDayIncomeAndPay(tmp.nYear, tmp.nMonth, tmp.nDay);
+				item.dPayMoney += moneyChange.dPay;
+				item.dIncomeMoney += moneyChange.dIncome;
+				arrTimeLineRecordList.add(item);
+				nLastRecordDay = tmp.nDay;
+			}
+
+			RecordItemDetails item = new RecordItemDetails();
+			item.Instead(tmp);
+			// 这个地方有可能错了，因为我们需要的是尾插法
+			arrTimeLineRecordList.add(item);
+		}
+
+		return arrTimeLineRecordList;
 	}
 
 	// 对从数据库中加载的数据进行一次整理，内部采用的是快速排序
