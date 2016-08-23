@@ -1,0 +1,13 @@
+package project.mynotepad.common_type;
+
+public class IncomeAndPay
+{
+	public static double dIncome;
+	public static double dPay;
+
+	public IncomeAndPay()
+	{
+		dIncome = 0;
+		dPay = 0;
+	}
+}
