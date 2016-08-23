@@ -97,6 +97,37 @@ public class DateInforManager
 		return true;
 	}
 
+	public static boolean DeleteSingleRecordItem(RecordItemDetails item)
+	{
+		ArrayList<DateInformation> arrDateInfoList = ControlCenter.GetDateInfo();
+		if(arrDateInfoList == null)
+			return false;
+
+		DateInformation dateInformation = GetDateInforByDate(item.nYear, item.nMonth, item.nDay);
+		if(dateInformation == null)
+			return false;
+
+		dateInformation.dPay -= item.dPayMoney;
+		dateInformation.dIncome -= item.dIncomeMoney;
+
+		return true;
+	}
+
+	private static void OrderDateInformation()
+	{
+		ArrayList<DateInformation> arrDateInfoList = ControlCenter.GetDateInfo();
+		if(arrDateInfoList == null)
+			return;
+
+		// 这样写会不会导致越界访问？待究
+		for(int i = 0; i < arrDateInfoList.size(); ++i)
+		{
+			DateInformation tmp = arrDateInfoList.get(i);
+			if(tmp.dPay <= 0 && tmp.dIncome <= 0)
+				arrDateInfoList.remove(i);
+		}
+	}
+
 	public static DateInformation GetDateInforByDate(int nYear, int nMonth, int nDay)
 	{
 		ArrayList<DateInformation> arrDateInfoList = ControlCenter.GetDateInfo();
