@@ -16,4 +16,13 @@ public class DateInformation
 		dPay = 0;
 		dIncome = 0;
 	}
+
+	public static void Instead(DateInformation other)
+	{
+		nYear = other.nYear;
+		nMonth = other.nMonth;
+		nDay = other.nDay;
+		dPay = other.dPay;
+		dIncome = other.dIncome;
+	}
 }
