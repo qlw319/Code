@@ -1,0 +1,23 @@
+package project.mynotepad.data_manager;
+
+import java.util.ArrayList;
+
+import project.mynotepad.common_type.MemberType;
+
+public class MemberTypeManager
+{
+	public static boolean LoadMemberType(ArrayList<MemberType> arrMemberTypeList)
+	{
+		return true;
+	}
+
+	public static boolean ChangeName(int nIndex, String strNewName)
+	{
+		return true;
+	}
+
+	public static boolean AddNewMember(String strNewMember)
+	{
+		return true;
+	}
+}
