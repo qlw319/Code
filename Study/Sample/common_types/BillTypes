@@ -1,0 +1,13 @@
+package project.mynotepad.common_type;
+
+public class BillTypes
+{
+	public static String strName;
+	public static String strPicture;
+
+	public BillTypes()
+	{
+		strName = new String();
+		strPicture = new String();
+	}
+}
