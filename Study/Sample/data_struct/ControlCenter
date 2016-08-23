@@ -1,0 +1,67 @@
+package project.mynotepad.datastructs;
+
+import android.content.Context;
+
+import java.util.ArrayList;
+
+import project.mynotepad.common_type.BillTypes;
+import project.mynotepad.common_type.MemberType;
+import project.mynotepad.common_type.RecordItemDetails;
+import project.mynotepad.common_type.WalletTypes;
+
+public class ControlCenter
+{
+	private static Context mContext;
+	private static boolean m_bInitialization = false;
+	private static ArrayList<MemberType> m_arrMemberTypes = null;
+	private static ArrayList<WalletTypes> m_arrWalletTypes = null;
+	private static ArrayList<BillTypes> m_arrBillTypes = null;
+	private static ArrayList<RecordItemDetails> m_arrRecordItemDetails;
+
+	public static boolean Initialization(Context context)
+	{
+		if(m_bInitialization == true)
+			return false;
+
+		m_bInitialization = true;
+		mContext = context;
+		m_arrMemberTypes = new ArrayList<>();
+		m_arrWalletTypes = new ArrayList<>();
+		m_arrBillTypes = new ArrayList<>();
+		m_arrRecordItemDetails = new ArrayList<>();
+		return true;
+	}
+
+	public static boolean Release()
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		m_bInitialization = false;
+		m_arrMemberTypes.clear();
+		m_arrWalletTypes.clear();
+		m_arrBillTypes.clear();
+		m_arrRecordItemDetails.clear();
+		return true;
+	}
+
+	public static ArrayList<MemberType> GetMemberTypes()
+	{
+		return m_arrMemberTypes;
+	}
+
+	public static ArrayList<WalletTypes> GetWalletTypes()
+	{
+		return m_arrWalletTypes;
+	}
+
+	public static ArrayList<BillTypes> GetBillTypes()
+	{
+		return m_arrBillTypes;
+	}
+
+	public static ArrayList<RecordItemDetails> GetRecordItemDetails()
+	{
+		return m_arrRecordItemDetails;
+	}
+}
