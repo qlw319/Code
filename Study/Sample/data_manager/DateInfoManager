@@ -1,0 +1,140 @@
+package project.mynotepad.data_manager;
+
+import java.util.ArrayList;
+
+import project.mynotepad.common_type.DateInformation;
+import project.mynotepad.common_type.IncomeAndPay;
+import project.mynotepad.common_type.RecordItemDetails;
+import project.mynotepad.datastructs.ControlCenter;
+
+public class DateInforManager
+{
+	public static boolean ImportDateInfo()
+	{
+		ArrayList<RecordItemDetails> arrRecordItemList = ControlCenter.GetRecordItemDetails();
+		ArrayList<DateInformation> arrDateInfoList = ControlCenter.GetDateInfo();
+		if(arrDateInfoList == null || arrDateInfoList == null)
+			return false;
+
+		int nLastRecordYear = 0;
+		int nLastRecordMonth = 0;
+		int nLastRecordDay = 0;
+		double dIncome = 0;
+		double dPay = 0;
+
+		for(int i = 0; i < arrRecordItemList.size(); ++i)
+		{
+			RecordItemDetails tmp = arrRecordItemList.get(i);
+			if(i == 0)
+			{
+				nLastRecordYear = tmp.nYear;
+				nLastRecordMonth = tmp.nMonth;
+				nLastRecordDay = tmp.nDay;
+
+				DateInformation item = new DateInformation();
+				item.nYear = tmp.nYear;
+				item.nMonth = tmp.nMonth;
+				item.nDay = tmp.nDay;
+				arrDateInfoList.add(item);
+			}
+
+			if(tmp.nYear == nLastRecordYear && tmp.nMonth != nLastRecordMonth && tmp.nDay == nLastRecordDay)
+			{
+				dIncome += tmp.dIncomeMoney;
+				dPay += tmp.dPayMoney;
+				continue;
+			}
+
+			//
+			DateInformation prev = arrDateInfoList.get(arrDateInfoList.size() - 1);
+			prev.dPay = dPay;
+			prev.dIncome = dIncome;
+			dIncome = 0;
+			dPay = 0;
+
+			//
+			DateInformation item = new DateInformation();
+			item.nYear = tmp.nYear;
+			item.nMonth = tmp.nMonth;
+			item.nDay = tmp.nDay;
+			arrDateInfoList.add(item);
+		}
+
+		//
+		if(arrRecordItemList.size() > 0)
+		{
+			DateInformation prev = arrDateInfoList.get(arrDateInfoList.size() - 1);
+			prev.dPay = dPay;
+			prev.dIncome = dIncome;
+		}
+
+		return true;
+	}
+
+	public static boolean AddSingleRecordItem(RecordItemDetails item)
+	{
+		ArrayList<DateInformation> arrDateInfoList = ControlCenter.GetDateInfo();
+		if(arrDateInfoList == null)
+			return false;
+
+		DateInformation dateInformation = GetDateInforByDate(item.nYear, item.nMonth, item.nDay);
+		if(dateInformation == null)
+		{
+			DateInformation records = new DateInformation();
+			records.nYear = item.nYear;
+			records.nMonth = item.nMonth;
+			records.nDay = item.nDay;
+			records.dPay = item.dPayMoney;
+			records.dIncome = item.dIncomeMoney;
+			arrDateInfoList.add(records);
+		}
+		else
+		{
+			dateInformation.dPay += item.dPayMoney;
+			dateInformation.dIncome += item.dIncomeMoney;
+		}
+
+		return true;
+	}
+
+	public static DateInformation GetDateInforByDate(int nYear, int nMonth, int nDay)
+	{
+		ArrayList<DateInformation> arrDateInfoList = ControlCenter.GetDateInfo();
+		if(arrDateInfoList == null)
+			return null;
+
+		for(int i = 0; i < arrDateInfoList.size(); ++i)
+		{
+			DateInformation tmp = arrDateInfoList.get(i);
+			if(tmp.nYear != nYear || tmp.nMonth != nMonth || tmp.nDay != nDay)
+				continue;
+
+			return tmp;
+		}
+
+		return null;
+	}
+
+	// 获取指定日期（年月日）的收支总帐
+	public static IncomeAndPay GetSpecifyDayIncomeAndPay(int nYear, int nMonth, int nDay)
+	{
+		ArrayList<DateInformation> arrDateInfoList = ControlCenter.GetDateInfo();
+		if(arrDateInfoList == null)
+			return null;
+
+		IncomeAndPay moneyChange = null;
+		for(int i = 0; i < arrDateInfoList.size(); ++i)
+		{
+			DateInformation tmp = arrDateInfoList.get(i);
+			if(tmp.nYear != nYear || tmp.nMonth != nMonth || tmp.nDay != nDay)
+				continue;
+
+			moneyChange = new IncomeAndPay();
+			moneyChange.dPay = tmp.dPay;
+			moneyChange.dIncome = tmp.dIncome;
+			break;
+		}
+
+		return moneyChange;
+	}
+}
