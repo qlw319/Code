@@ -1,0 +1,46 @@
+package project.mynotepad.common_type;
+
+public class RecordItemDetails
+{
+	public static int nYear;
+	public static int nMonth;
+	public static int nDay;
+	public static int nHour;
+	public static int nMinute;
+	public static String strMember;
+	public static String strRemark;
+	public static BillTypes eBillType;
+	public static WalletTypes eWalletType;
+	public static double dMoney;
+
+	public RecordItemDetails()
+	{
+		nYear = 0;
+		nMonth = 0;
+		nDay = 0;
+		nHour = -1;
+		nMinute = -1;
+		strMember = new String();
+		strRemark = new String();
+		eBillType = new BillTypes();
+		eWalletType = new WalletTypes();
+		dMoney = 0;
+	}
+
+	public boolean Instead(RecordItemDetails other)
+	{
+		nYear = other.nYear;
+		nMonth = other.nMonth;
+		nDay = other.nDay;
+		nHour = other.nHour;
+		nMinute = other.nMinute;
+		strMember = other.strMember;
+		strRemark = other.strRemark;
+		eBillType.strName = other.eBillType.strName;
+		eWalletType.strName = other.eWalletType.strName;
+		eWalletType.strType = other.eWalletType.strType;
+		dMoney = other.dMoney;
+
+		return true;
+	}
+}
