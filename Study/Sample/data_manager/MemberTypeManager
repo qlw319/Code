@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import project.mynotepad.common_type.MemberType;
 
+import static project.mynotepad.datastructs.ControlCenter.GetMemberTypes;
+
 public class MemberTypeManager
 {
 	public static boolean LoadMemberType(ArrayList<MemberType> arrMemberTypeList)
@@ -13,11 +15,32 @@ public class MemberTypeManager
 
 	public static boolean ChangeName(int nIndex, String strNewName)
 	{
+		if(strNewName == null || strNewName.length() == 0)
+			return false;
+
+		ArrayList<MemberType> arrMemberTypeList = GetMemberTypes();
+		if(arrMemberTypeList == null)
+			return false;
+
+		if(nIndex >= arrMemberTypeList.size())
+			return false;
+
+		MemberType member = arrMemberTypeList.get(nIndex);
+		member.strName = strNewName;
+
 		return true;
 	}
 
 	public static boolean AddNewMember(String strNewMember)
 	{
+		ArrayList<MemberType> arrMemberTypeList = GetMemberTypes();
+		if(arrMemberTypeList == null)
+			return false;
+
+		MemberType newMember = new MemberType();
+		newMember.strName = strNewMember;
+		arrMemberTypeList.add(newMember);
+
 		return true;
 	}
 }
