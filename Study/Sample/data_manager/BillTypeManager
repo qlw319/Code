@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import project.mynotepad.common_type.BillTypes;
 
+import static project.mynotepad.datastructs.ControlCenter.GetBillTypes;
+
 public class BillTypeManager
 {
 	public static boolean LoadBillType(ArrayList<BillTypes> arrBillTypeList)
@@ -13,21 +15,58 @@ public class BillTypeManager
 
 	public static boolean ChangeName(int nIndex, String strNewName)
 	{
+		if(strNewName == null || strNewName.length() == 0)
+			return false;
+
+		ArrayList<BillTypes> arrBillTypeList = GetBillTypes();
+		if(arrBillTypeList == null || nIndex >= arrBillTypeList.size())
+			return false;
+
+		BillTypes billType = arrBillTypeList.get(nIndex);
+		billType.strName = strNewName;
+
 		return true;
 	}
 
 	public static boolean ChangePicture(int nIndex, String strNewPicture)
 	{
+		if(strNewPicture == null || strNewPicture.length() == 0)
+			return false;
+
+		ArrayList<BillTypes> arrBillTypeList = GetBillTypes();
+		if(arrBillTypeList == null || nIndex >= arrBillTypeList.size())
+			return false;
+
+		BillTypes billType = arrBillTypeList.get(nIndex);
+		billType.strPicture = strNewPicture;
+
 		return true;
 	}
 
 	public static boolean ModifyType(int nIndex, String strNewName, String strNewPicture)
 	{
+		if(strNewName == null || strNewPicture == null || strNewName.length() == 0 || strNewPicture.length() == 0)
+			return false;
+
+		ArrayList<BillTypes> arrBillTypeList = GetBillTypes();
+		if(arrBillTypeList == null || nIndex >= arrBillTypeList.size())
+			return false;
+
+		BillTypes billType = arrBillTypeList.get(nIndex);
+		billType.strName = strNewName;
+		billType.strPicture = strNewPicture;
+
 		return true;
 	}
 
 	public static boolean AddType(BillTypes eNewBillType)
 	{
+		ArrayList<BillTypes> arrBillTypeList = GetBillTypes();
+		if(arrBillTypeList == null)
+			return false;
+
+		arrBillTypeList.add(eNewBillType);
+
 		return true;
 	}
 }
