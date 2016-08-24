@@ -11,8 +11,8 @@ public class RecordItemDetails
 	public static String strRemark;
 	public static BillTypes eBillType;
 	public static WalletTypes eWalletType;
-	public static double dIncomeMoney;
 	public static double dPayMoney;
+	public static double dIncomeMoney;
 
 	public RecordItemDetails()
 	{
@@ -25,8 +25,8 @@ public class RecordItemDetails
 		strRemark = new String();
 		eBillType = new BillTypes();
 		eWalletType = new WalletTypes();
-		dIncomeMoney = 0;
 		dPayMoney = 0;
+		dIncomeMoney = 0;
 	}
 
 	public boolean Instead(RecordItemDetails other)
@@ -36,13 +36,18 @@ public class RecordItemDetails
 		nDay = other.nDay;
 		nHour = other.nHour;
 		nMinute = other.nMinute;
-		strMember = other.strMember;
-		strRemark = other.strRemark;
-		eBillType.strName = other.eBillType.strName;
-		eWalletType.strName = other.eWalletType.strName;
-		eWalletType.strType = other.eWalletType.strType;
-		dIncomeMoney = other.dIncomeMoney;
+		if(strMember != other.strMember)
+			strMember = other.strMember;
+		if(strRemark != other.strRemark)
+			strRemark = other.strRemark;
+		if(eBillType.strName != other.eBillType.strName)
+			eBillType.strName = other.eBillType.strName;
+		if(eWalletType.strName != other.eWalletType.strName)
+			eWalletType.strName = other.eWalletType.strName;
+		if(eWalletType.strType != other.eWalletType.strType)
+			eWalletType.strType = other.eWalletType.strType;
 		dPayMoney = other.dPayMoney;
+		dIncomeMoney = other.dIncomeMoney;
 
 		return true;
 	}
