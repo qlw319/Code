@@ -196,6 +196,28 @@ public class DateInforManager
 		return moneyChange;
 	}
 
+	public static IncomeAndPay GetLastMonthIncomeAndPay(int nYear, int nMonth)
+	{
+		ArrayList<DateInformation> arrDateInfoList = ControlCenter.GetDateInfo();
+		if(arrDateInfoList == null)
+			return null;
+
+		IncomeAndPay moneyChange = null;
+		for(int i = 0; i < arrDateInfoList.size(); ++i)
+		{
+			DateInformation tmp = arrDateInfoList.get(i);
+			if(tmp.nYear != nYear || tmp.nMonth != nMonth)
+				continue;
+
+			if(moneyChange == null)
+				moneyChange = new IncomeAndPay();
+			moneyChange.dPay += tmp.dPay;
+			moneyChange.dIncome += tmp.dIncome;
+		}
+
+		return moneyChange;
+	}
+
 	// 对数据库中加载出来的数据进行快速排序，排序是按时间从前到后排列
 	private static void QuickSort(ArrayList<DateInformation> compare, int left, int right)
 	{
