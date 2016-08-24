@@ -1,0 +1,319 @@
+package project.mynotepad.database_manager;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+
+import java.io.File;
+
+import project.mynotepad.common_type.RecordItemDetails;
+
+public class DBOpenHelper extends SQLiteOpenHelper
+{
+	private static final String ROOT_PATH = Environment.getExternalStorageDirectory().getPath();
+	private static final String FILEFLAG = File.separator;
+	private static final String FILENAME = "StormTotem/user.db";
+
+	private static final String DATABASE_NAME = ROOT_PATH + FILEFLAG + FILENAME;
+	private static final int DATABASE_VERSION = 1;
+
+	private SQLiteDatabase m_dbRead;
+	private SQLiteDatabase m_dbWrite;
+
+	public DBOpenHelper(Context context)
+	{
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		m_dbRead = getReadableDatabase();
+		m_dbWrite = getWritableDatabase();
+	}
+
+	public void release()
+	{
+		m_dbRead.close();
+		m_dbWrite.close();
+	}
+
+	// 第一次使用软件
+	@Override
+	public void onCreate(SQLiteDatabase db)
+	{
+		String sql = "CREATE TABLE bill_record (" +
+				"    timestamp DATETIME PRIMARY KEY" +
+				"                       NOT NULL" +
+				"                       DEFAULT CURRENT_TIMESTAMP," +
+				"    year      INT      NOT NULL," +
+				"    month     INT      NOT NULL," +
+				"    day       INT      NOT NULL," +
+				"    hour      INT      NOT NULL," +
+				"    minute    INT      NOT NULL," +
+				"    billId    INT      NOT NULL," +
+				"    walletId  INT      NOT NULL," +
+				"    pay       DOUBLE   NOT NULL," +
+				"    income    DOUBLE   NOT NULL," +
+				"    member    TEXT," +
+				"    remark    TEXT );";
+
+		db.beginTransaction();
+		try
+		{
+			db.execSQL(sql);
+			db.setTransactionSuccessful();
+		}
+		finally
+		{
+			db.endTransaction();
+		}
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+	{
+
+	}
+
+	public boolean add(RecordItemDetails ddt)
+	{
+		String sql1 = "select * from bill_record order by timestamp desc";
+		String sql2 = "insert into bill_record (year, month, day, hour, minute, billId, walletId, pay, income, member, remark) values(?,?,?,?,?,?,?,?,?,?,?)";
+
+		int nCountBefore = 0;
+		Cursor cursor = m_dbRead.rawQuery(sql1, null);
+		if(cursor.moveToFirst())
+			nCountBefore = cursor.getCount();
+
+		m_dbWrite.beginTransaction();
+		try
+		{
+			m_dbWrite.execSQL(sql2, new Object[]{
+					ddt.nYear,
+					ddt.nMonth,
+					ddt.nDay,
+					ddt.nHour,
+					ddt.nMinute,
+					ddt.nBillTypeId,
+					ddt.nWalletTypeId,
+					ddt.dPayMoney,
+					ddt.dIncomeMoney,
+					ddt.strMember,
+					ddt.strRemark
+			});
+			m_dbWrite.setTransactionSuccessful();
+		}
+		finally
+		{
+			m_dbWrite.endTransaction();
+		}
+
+		cursor = m_dbRead.rawQuery(sql1, null);
+		int nCountAfter = cursor.getCount();
+
+		if(nCountBefore >= nCountAfter)
+			return false;
+
+		if(cursor.moveToFirst())
+			ddt.strTimestamp = cursor.getString(cursor.getColumnIndex("timestamp"));
+
+		cursor.close();
+		return true;
+	}
+
+	public boolean delete(RecordItemDetails ddt)
+	{
+		String sql2 = "delete from bill_record where timestamp=?";
+
+		if(find(ddt) != null)
+		{
+			m_dbWrite.beginTransaction();
+			try
+			{
+				m_dbWrite.execSQL(sql2, new Object[]{ddt.strTimestamp});
+				m_dbWrite.setTransactionSuccessful();
+			}
+			finally
+			{
+				m_dbWrite.endTransaction();
+			}
+		}
+
+		if(find(ddt) != null)
+			return false;
+
+		return true;
+	}
+
+	public RecordItemDetails find(RecordItemDetails ddt)
+	{
+		String sql = "select * from bill_record where timestamp=?";
+		Cursor cursor = m_dbRead.rawQuery(sql, new String[]{ddt.strTimestamp});
+		if(cursor.moveToFirst())
+		{
+			RecordItemDetails newddt = new RecordItemDetails();
+			newddt.strTimestamp = cursor.getString(cursor.getColumnIndex("timestamp"));
+			newddt.nYear = cursor.getInt(cursor.getColumnIndex("year"));
+			newddt.nMonth = cursor.getInt(cursor.getColumnIndex("month"));
+			newddt.nDay = cursor.getInt(cursor.getColumnIndex("day"));
+			newddt.nHour = cursor.getInt(cursor.getColumnIndex("hour"));
+			newddt.nMinute = cursor.getInt(cursor.getColumnIndex("minute"));
+			newddt.nBillTypeId = cursor.getInt(cursor.getColumnIndex("billId"));
+			newddt.nWalletTypeId = cursor.getInt(cursor.getColumnIndex("walletId"));
+			newddt.dIncomeMoney = cursor.getDouble(cursor.getColumnIndex("income"));
+			newddt.dPayMoney = cursor.getDouble(cursor.getColumnIndex("pay"));
+			newddt.strMember = cursor.getString(cursor.getColumnIndex("member"));
+			newddt.strRemark = cursor.getString(cursor.getColumnIndex("remark"));
+
+			cursor.close();
+			return newddt;
+		}
+
+		return null;
+	}
+
+	public boolean update(RecordItemDetails ddt)
+	{
+		String sql = "update bill_record " +
+				"set year=?,month=?,day=?,hour=?,minute=?,billId=?,walletId=?,pay=?,income=?,member,remark=? " +
+				"where timestamp=?";
+
+		if(find(ddt) != null)
+			return false;
+
+		m_dbWrite.beginTransaction();
+		try
+		{
+			m_dbWrite.execSQL(sql, new Object[]{
+					ddt.nYear,
+					ddt.nMonth,
+					ddt.nDay,
+					ddt.nHour,
+					ddt.nMinute,
+					ddt.nBillTypeId,
+					ddt.nWalletTypeId,
+					ddt.dPayMoney,
+					ddt.dIncomeMoney,
+					ddt.strMember,
+					ddt.strRemark,
+					ddt.strTimestamp
+			});
+			m_dbWrite.setTransactionSuccessful();
+		}
+		finally
+		{
+			m_dbWrite.endTransaction();
+		}
+
+		RecordItemDetails newddt = find(ddt);
+		if(newddt == null)
+			return false;
+
+		if(!ddt.strTimestamp.equals(newddt.strTimestamp))
+			return false;
+
+		return true;
+	}
+
+	public RecordItemDetails getDataByIndex(int index)
+	{
+		String sql = "select * from bill_record order by timestamp desc";
+		Cursor cursor = m_dbRead.rawQuery(sql, null);
+		RecordItemDetails newddt = new RecordItemDetails();
+		if(cursor.moveToFirst())
+		{
+			for(int i = 0; i < index; i++)
+				cursor.moveToNext();
+
+			newddt.strTimestamp = cursor.getString(cursor.getColumnIndex("timestamp"));
+			newddt.nYear = cursor.getInt(cursor.getColumnIndex("year"));
+			newddt.nMonth = cursor.getInt(cursor.getColumnIndex("month"));
+			newddt.nDay = cursor.getInt(cursor.getColumnIndex("day"));
+			newddt.nHour = cursor.getInt(cursor.getColumnIndex("hour"));
+			newddt.nMinute = cursor.getInt(cursor.getColumnIndex("minute"));
+			newddt.nBillTypeId = cursor.getInt(cursor.getColumnIndex("billId"));
+			newddt.nWalletTypeId = cursor.getInt(cursor.getColumnIndex("walletID"));
+			newddt.dPayMoney = cursor.getDouble(cursor.getColumnIndex("pay"));
+			newddt.dIncomeMoney = cursor.getDouble(cursor.getColumnIndex("income"));
+			newddt.strMember = cursor.getString(cursor.getColumnIndex("member"));
+			newddt.strRemark = cursor.getString(cursor.getColumnIndex("remark"));
+		}
+		cursor.close();
+		return newddt;
+	}
+
+	public int getCount()
+	{
+		String sql = "select * from bill_record";
+		Cursor cursor = m_dbRead.rawQuery(sql, null);
+		return cursor.getCount();
+	}
+
+	public double getSumMoney(int year, int month, int day, int type)
+	{
+		if(year <= 0)
+			return -1.0;
+
+		String sql = null;
+		Cursor cursor = null;
+		if((year > 0) && (month < 0) && (day < 0))
+		{
+			sql = "select sum(money) from bill_record where year=? and type1=?";
+			cursor = m_dbRead.rawQuery(sql, new String[]{
+					Integer.toString(year),
+					Integer.toString(type)
+			});
+		}
+
+		else if((year > 0) && (month > 0) && (day < 0))
+		{
+			sql = "select sum(money) from bill_record where year=? and month=? and type1=?";
+			cursor = m_dbRead.rawQuery(sql, new String[]{
+					Integer.toString(year),
+					Integer.toString(month),
+					Integer.toString(type)
+			});
+		}
+		else if((year > 0) && (month > 0) && (day > 0))
+		{
+			sql = "select sum(money) from bill_record where year=? and month=? and day=? and type1=?";
+
+			cursor = m_dbRead.rawQuery(sql, new String[]{
+					Integer.toString(year),
+					Integer.toString(month),
+					Integer.toString(day),
+					Integer.toString(type)
+			});
+		}
+
+		if(cursor.moveToFirst())
+		{
+			return cursor.getDouble(cursor.getColumnIndex("sum(money)"));
+		}
+
+		return -1.0;
+	}
+
+	public double getPeriod(int yearStart, int monthStart, int dayStart, int yearEnd, int monthEnd, int dayEnd, int type)
+	{
+		String sql = "select sum(money) from bill_record " +
+				"where year>=? and year<=? " +
+				"and month>=? and month<=? " +
+				"and day>=? and day<=? " +
+				"and type1=?";
+		Cursor cursor = m_dbRead.rawQuery(sql, new String[]{
+				Integer.toString(yearStart),
+				Integer.toString(monthStart),
+				Integer.toString(dayStart),
+				Integer.toString(yearEnd),
+				Integer.toString(monthEnd),
+				Integer.toString(dayEnd),
+				Integer.toString(type)
+		});
+
+		if(cursor.moveToFirst())
+		{
+			return cursor.getDouble(cursor.getColumnIndex("sum(money)"));
+		}
+
+		return -1.0;
+	}
+}
