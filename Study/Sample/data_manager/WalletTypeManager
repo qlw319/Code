@@ -3,22 +3,57 @@ package project.mynotepad.data_manager;
 import java.util.ArrayList;
 
 import project.mynotepad.common_type.WalletTypes;
-import project.mynotepad.datastructs.ControlCenter;
+
+import static project.mynotepad.datastructs.ControlCenter.GetWalletTypes;
 
 public class WalletTypeManager
 {
+	public static boolean LoadWalletType()
+	{
+		ArrayList<WalletTypes> arrWalletType = GetWalletTypes();
+		if(arrWalletType == null)
+			return false;
+
+		return true;
+	}
+
 	public static boolean ChangeName(int nIndex, String strNewName)
 	{
+		if(strNewName == null || strNewName.length() == 0)
+			return false;
+
+		ArrayList<WalletTypes> arrayList = GetWalletTypes();
+		if(arrayList == null || nIndex >= arrayList.size())
+			return false;
+
+		WalletTypes walletType = arrayList.get(nIndex);
+		walletType.strName = strNewName;
+
 		return true;
 	}
 
 	public static boolean ChangeBackgroundColor(int nIndex, String strNewColor)
 	{
+		if(strNewColor == null || strNewColor.length() == 0)
+			return false;
+
+		ArrayList<WalletTypes> arrayList = GetWalletTypes();
+		if(arrayList == null || nIndex >= arrayList.size())
+			return false;
+
+		WalletTypes walletType = arrayList.get(nIndex);
+		walletType.strColor = strNewColor;
+
 		return true;
 	}
 
 	public static boolean DeleteSpecifiedType(int nIndex)
 	{
+		ArrayList<WalletTypes> arrayList = GetWalletTypes();
+		if(arrayList == null || nIndex >= arrayList.size())
+			return false;
+
+		arrayList.remove(nIndex);
 		return true;
 	}
 
@@ -32,7 +67,7 @@ public class WalletTypeManager
 
 	public static int GetIndexByNameAndType(String strName, String strType)
 	{
-		ArrayList<WalletTypes> arrayList = ControlCenter.GetWalletTypes();
+		ArrayList<WalletTypes> arrayList = GetWalletTypes();
 		if(arrayList == null)
 			return -1;
 
