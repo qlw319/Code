@@ -13,24 +13,80 @@ public class RecordItemDetailManager
 	// 从数据库中把数据导入内存
 	public static boolean LoadRecordItem(ArrayList<RecordItemDetails> arrRecordItemDetailsList)
 	{
+		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
+		if(arrAllRecordList == null)
+			return false;
+
 		return true;
 	}
 
 	// 增加一条记录
 	public static boolean AddRecordItem(RecordItemDetails eNewItem)
 	{
+		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
+		if(arrAllRecordList == null)
+			return false;
+
+		int nIndex = FindRecordItemIndex(eNewItem);
+		if(nIndex == -1)
+		{
+			arrAllRecordList.add(eNewItem);
+			OrderItemRecords();
+		}
+		else
+			arrAllRecordList.add(nIndex, eNewItem);
+
 		return true;
 	}
 
 	// 删除一条记录
 	public static boolean DeleteRecordItem(RecordItemDetails eItem)
 	{
+		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
+		if(arrAllRecordList == null)
+			return false;
+
+		int nIndex = FindRecordItemIndex(eItem);
+		if(nIndex == -1)
+			return false;
+		else
+			arrAllRecordList.remove(nIndex);
+
 		return true;
 	}
 
 	// 修改一条记录
 	public static boolean ModifyRecordItem(RecordItemDetails eItemBefore, RecordItemDetails eItemModify)
 	{
+		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
+		if(arrAllRecordList == null)
+			return false;
+
+		int nIndex = FindRecordItemIndex(eItemBefore);
+		if(nIndex == -1)
+			return false;
+
+		if(eItemBefore.nYear == eItemModify.nYear && eItemBefore.nMonth == eItemModify.nMonth && eItemBefore.nDay == eItemModify.nDay)
+		{
+			RecordItemDetails recordItemDetail = arrAllRecordList.get(nIndex);
+			if(recordItemDetail.strMember != eItemModify.strMember)
+				recordItemDetail.strMember = eItemModify.strMember;
+
+			if(recordItemDetail.strRemark != eItemModify.strRemark)
+				recordItemDetail.strRemark = eItemModify.strRemark;
+
+			recordItemDetail.dPayMoney = eItemModify.dPayMoney;
+			recordItemDetail.dIncomeMoney = eItemModify.dIncomeMoney;
+			recordItemDetail.eBillType.Instead(eItemModify.eBillType);
+			recordItemDetail.eWalletType.Instead(eItemModify.eWalletType);
+		}
+		else
+		{
+			arrAllRecordList.remove(nIndex);
+			arrAllRecordList.add(eItemModify);
+			OrderItemRecords();
+		}
+
 		return true;
 	}
 
@@ -181,5 +237,24 @@ public class RecordItemDetailManager
 			return false;
 
 		return true;
+	}
+
+	public static int FindRecordItemIndex(RecordItemDetails item)
+	{
+		ArrayList<RecordItemDetails> arrItemRecordsList = ControlCenter.GetRecordItemDetails();
+		if(arrItemRecordsList == null)
+			return -1;
+
+		int nIndex = -1;
+		for(int i = 0; i < arrItemRecordsList.size(); ++i)
+		{
+			RecordItemDetails tmp = arrItemRecordsList.get(i);
+			if(item.nYear != tmp.nYear || item.nMonth != tmp.nMonth || item.nDay != tmp.nDay)
+				continue;
+
+			nIndex = i;
+			break;
+		}
+		return nIndex;
 	}
 }
