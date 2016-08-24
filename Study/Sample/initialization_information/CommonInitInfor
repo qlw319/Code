@@ -1,0 +1,94 @@
+package project.mynotepad.initialization_information;
+
+public class CommonInitInfor
+{
+	// 账户信息icon的信息
+	public static String[] AllAccoutTypes = new String[]{
+			"现金",
+			"储蓄卡",
+			"信用卡",
+			"网络账户",
+			"投资账户",
+			"应收款",
+			"应付款"
+	};
+
+	public static String[] AllAccountTypesTips = new String[]{
+			"现金余额",
+			"储蓄卡余额",
+			"信用卡余额",
+			"网络账户余额",
+			"投资账户余额",
+			"别人欠我的钱",
+			"我欠别人的钱",
+			};
+
+	public static String[] AllAccountTypeLayouts = new String[]{
+			""
+	};
+
+	public static String[] InitAccountTypes = new String[]{
+			"现金",
+			"储蓄卡",
+			"信用卡",
+			"支付宝",
+			"应收账",
+			"应付账",
+			};
+
+	public static String[] AllAccountColors = new String[]{
+			"#D19CF5",
+			"#6B8CC2",
+			"#8080FF",
+			"#0080C0",
+			"#FFFF80",
+			"#808000",
+			"#808080",
+			"#FF8040"
+	};
+
+	// 收支情况的icon信息
+	public static String[] AllIncomedAndPayBackground = new String[]{
+	};
+
+	public static String[] InitPayTypes = new String[]{
+			"一般",
+			"餐饮",
+			"交通",
+			"酒水饮料",
+			"水果",
+			"零食",
+			"买菜",
+			"衣服鞋包",
+			"生活用品",
+			"话费",
+			"护肤彩妆",
+			"房租",
+			"电影",
+			"淘宝",
+			"红包",
+			"药品"
+	};
+
+	public static String[] InitPayTypeBackground = new String[]{
+	};
+
+	public static String[] InitIncomeTypes = new String[]{
+			"工资",
+			"生活费",
+			"红包",
+			"零花钱",
+			"外快兼职",
+			"投资收入",
+			"奖金",
+			"报销",
+			"现金",
+			"退款",
+			"支付宝",
+			"其他",
+			};
+
+	public static String[] InitIncomeTypeBackground = new String[]{
+	};
+
+}
