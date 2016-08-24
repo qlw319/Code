@@ -55,6 +55,17 @@ public class DBOpenHelper extends SQLiteOpenHelper
 				"    member    TEXT," +
 				"    remark    TEXT );";
 
+		String sq2 = "CREATE TABLE bill_type_tab"  +
+				"    icon_name TEXT     NOT NULL," +
+				"    icon_bg   TEXT     NOT NULL," +
+				"    icon_id   INT      NOT NULL);";
+
+		String sq3 = "CREATE TABLE wallet_type_tab" +
+				"    wallet_name TEXT	NOT NULL" +
+				"  wallet_layout TEXT	NOT NULL" +
+				"   wallet_color TEXT	NOT NULL" +
+				"   wallet_id	 TEXT	NOT NULL);";
+
 		db.beginTransaction();
 		try
 		{
