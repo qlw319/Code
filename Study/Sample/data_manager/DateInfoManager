@@ -223,6 +223,7 @@ public class DateInforManager
 			if(left < right)
 				arrItemsList.get(right--).Instead(arrItemsList.get(left));
 		}
+
 		arrItemsList.get(left).Instead(pivot);
 		return left;
 	}
