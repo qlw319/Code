@@ -77,8 +77,8 @@ public class RecordItemDetailManager
 
 			recordItemDetail.dPayMoney = eItemModify.dPayMoney;
 			recordItemDetail.dIncomeMoney = eItemModify.dIncomeMoney;
-			recordItemDetail.eBillType.Instead(eItemModify.eBillType);
-			recordItemDetail.eWalletType.Instead(eItemModify.eWalletType);
+			recordItemDetail.nBillTypeId = eItemModify.nBillTypeId;
+			recordItemDetail.nWalletTypeId = eItemModify.nWalletTypeId;
 		}
 		else
 		{
@@ -248,8 +248,7 @@ public class RecordItemDetailManager
 		int nIndex = -1;
 		for(int i = 0; i < arrItemRecordsList.size(); ++i)
 		{
-			RecordItemDetails tmp = arrItemRecordsList.get(i);
-			if(item.nYear != tmp.nYear || item.nMonth != tmp.nMonth || item.nDay != tmp.nDay)
+			if(arrItemRecordsList.get(i).strTimestamp == item.strTimestamp)
 				continue;
 
 			nIndex = i;
