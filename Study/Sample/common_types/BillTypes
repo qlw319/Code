@@ -10,4 +10,12 @@ public class BillTypes
 		strName = new String();
 		strPicture = new String();
 	}
+
+	public void Instead(BillTypes other)
+	{
+		if(strName != other.strName)
+			strName = other.strName;
+		if(strPicture != other.strPicture)
+			strPicture = other.strPicture;
+	}
 }
