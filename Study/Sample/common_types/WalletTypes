@@ -4,15 +4,17 @@ public class WalletTypes
 {
 	public static String strName;
 	public static String strType;
-	public static int nColorIndex;
+	public static String strColor;
+	public static int nWalletTypeID;
 
 	public WalletTypes()
 	{
 		strName = new String();
 		strType = new String();
-		nColorIndex = -1;
+		strColor = new String();
+		nWalletTypeID = 0;
 	}
-	
+
 	public void Instead(WalletTypes other)
 	{
 		if(strName != other.strName)
@@ -21,5 +23,6 @@ public class WalletTypes
 			strType = other.strType;
 		if(strColor != other.strColor)
 			strColor = other.strColor;
+		nWalletTypeID = other.nWalletTypeID;
 	}
 }
