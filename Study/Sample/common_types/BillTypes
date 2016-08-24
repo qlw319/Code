@@ -4,11 +4,13 @@ public class BillTypes
 {
 	public static String strName;
 	public static String strPicture;
+	public static int nBillTypeID;
 
 	public BillTypes()
 	{
 		strName = new String();
 		strPicture = new String();
+		nBillTypeID = 0;
 	}
 
 	public void Instead(BillTypes other)
@@ -17,5 +19,6 @@ public class BillTypes
 			strName = other.strName;
 		if(strPicture != other.strPicture)
 			strPicture = other.strPicture;
+		nBillTypeID = other.nBillTypeID;
 	}
 }
