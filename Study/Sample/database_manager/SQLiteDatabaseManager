@@ -1,0 +1,138 @@
+package project.mynotepad.database_manager;
+
+import android.content.Context;
+
+import java.util.ArrayList;
+
+import project.mynotepad.common_type.BillTypes;
+import project.mynotepad.common_type.RecordItemDetails;
+import project.mynotepad.common_type.WalletTypes;
+
+public class SQLiteDatabaseManager
+{
+	private DBOpenHelper m_DBOpenHelper = null;
+	private boolean m_bInitialization = false;
+
+	public SQLiteDatabaseManager(Context context)
+	{
+		if(m_bInitialization == false)
+			return;
+
+		this.Initialization(context);
+	}
+
+	public boolean Initialization(Context context)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		m_DBOpenHelper = new DBOpenHelper(context);
+		return true;
+	}
+
+	private void Release()
+	{
+		if(m_bInitialization == false)
+			return;
+
+		m_bInitialization = false;
+		m_DBOpenHelper.Release();
+	}
+
+	// Bill record items
+	public boolean LoadBillRecords(ArrayList<RecordItemDetails> arrReocrdList)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.GetAllBillRecords(arrReocrdList);
+	}
+
+	public boolean AddABillRecord(RecordItemDetails item)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.AddBillRecord(item);
+	}
+
+	public boolean DeleteABillRecord(RecordItemDetails item)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.DeleteInBillRecord(item);
+	}
+
+	public boolean ModifyABillRecord(RecordItemDetails item)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.UpdateBillRecord(item);
+	}
+
+	// income bill type tab operation
+	public boolean LoadIncomeBillType(ArrayList<BillTypes> arrIncomeBillTypeList)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.GetAllIncomeBillType(arrIncomeBillTypeList);
+	}
+
+	public boolean AddAIncomeBillType(BillTypes item)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.AddIncomeBillTypeTab(item);
+	}
+
+	public boolean DeleteAIncomeBillType(BillTypes item)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.DeleteInIncomeBillTypeTab(item);
+	}
+
+	public boolean ModifyAIncomeBillType(BillTypes item)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.UpdateIncomeBillTypeTab(item);
+	}
+
+	// pay bill type tab operation
+	public boolean LoadPayBillType(ArrayList<BillTypes> arrPayBillTypeList)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.GetAllPayBillType(arrPayBillTypeList);
+	}
+
+	public boolean AddAPayBillType(BillTypes item)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.AddPayBillTypeTab(item);
+	}
+
+	public boolean DeleteAPayBillType(BillTypes item)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.DeleteInPayBillTypeTab(item);
+	}
+
+	// wallet type tab operation
+	public boolean LoadAllWalletType(ArrayList<WalletTypes> arrWalletTypeList)
+	{
+		return true;
+	}
+}
