@@ -14,8 +14,6 @@ public class ControlCenter
 {
 	private static Context mContext;
 	private static boolean m_bInitialization = false;
-	private static int m_nBillTypeIdRelative = 0;
-	private static int m_nWalletTypeIdRelative = 0;
 	private static ArrayList<MemberType> m_arrMemberTypes = null;
 	private static ArrayList<WalletTypes> m_arrWalletTypes = null;
 	private static ArrayList<BillTypes> m_arrBillTypes = null;
@@ -72,15 +70,5 @@ public class ControlCenter
 	public static ArrayList<DateInformation> GetDateInfo()
 	{
 		return m_arrDateInformation;
-	}
-
-	public static int GetBillTypeIdRelative()
-	{
-		return m_nBillTypeIdRelative;
-	}
-
-	public static int GetWalletTypeIdRelative()
-	{
-		return m_nWalletTypeIdRelative;
 	}
 }
