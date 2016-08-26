@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import project.mynotepad.common_type.BillTypes;
 import project.mynotepad.common_type.RecordItemDetails;
@@ -73,8 +74,12 @@ public class DBOpenHelper extends SQLiteOpenHelper
 				"   wallet_color TEXT	NOT NULL" +
 				"   wallet_id	 TEXT	NOT NULL);";
 
-		String sq5 = "CREATE TABLE id_relative_tab" +
-				"  bill_id_relative INT	NOT NULL" +
+		String sq5 = "CREATE TABLE member_tab" +
+				"   member_name	 TEXT	NOT NULL);";
+
+		String sq6 = "CREATE TABLE id_relative_tab" +
+				"  income_bill_id_relative INT	NOT NULL" +
+				"  pay_bill_id_relative INT	NOT NULL" +
 				"wallet_id_relative INT NOT NULL);";
 
 		db.beginTransaction();
@@ -84,6 +89,8 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			db.execSQL(sq2);
 			db.execSQL(sq3);
 			db.execSQL(sq4);
+			db.execSQL(sq5);
+			db.execSQL(sq6);
 			db.setTransactionSuccessful();
 		}
 		finally
@@ -100,6 +107,9 @@ public class DBOpenHelper extends SQLiteOpenHelper
 
 	public boolean AddBillRecord(RecordItemDetails ddt)
 	{
+		if(FindInBillRecord(ddt) != null)
+			return false;
+
 		String sql1 = "select * from bill_record order by timestamp desc";
 		String sql2 = "insert into bill_record (year, month, day, hour, minute, billId, walletId, pay, income, member, remark) values(?,?,?,?,?,?,?,?,?,?,?)";
 
@@ -161,6 +171,8 @@ public class DBOpenHelper extends SQLiteOpenHelper
 				m_dbWrite.endTransaction();
 			}
 		}
+		else
+			return false;
 
 		if(FindInBillRecord(ddt) != null)
 			return false;
@@ -234,6 +246,38 @@ public class DBOpenHelper extends SQLiteOpenHelper
 
 		if(!ddt.strTimestamp.equals(newddt.strTimestamp))
 			return false;
+
+		return true;
+	}
+
+	public boolean GetAllBillRecords(ArrayList<RecordItemDetails> arrRecordList)
+	{
+		arrRecordList.clear();
+
+		String sql = "select * from bill_record order by timestamp desc";
+		Cursor cursor = m_dbRead.rawQuery(sql, null);
+		if(cursor.moveToFirst() == false)
+			return false;
+
+		int nItemCount = cursor.getCount();
+		for(int i = 0; i < nItemCount; ++i)
+		{
+			RecordItemDetails item = new RecordItemDetails();
+
+			item.strTimestamp = cursor.getString(cursor.getColumnIndex("timestamp"));
+			item.nYear = cursor.getInt(cursor.getColumnIndex("year"));
+			item.nMonth = cursor.getInt(cursor.getColumnIndex("month"));
+			item.nDay = cursor.getInt(cursor.getColumnIndex("day"));
+			item.nHour = cursor.getInt(cursor.getColumnIndex("hour"));
+			item.nMinute = cursor.getInt(cursor.getColumnIndex("minute"));
+			item.nBillTypeId = cursor.getInt(cursor.getColumnIndex("billId"));
+			item.nWalletTypeId = cursor.getInt(cursor.getColumnIndex("walletID"));
+			item.dPayMoney = cursor.getDouble(cursor.getColumnIndex("pay"));
+			item.dIncomeMoney = cursor.getDouble(cursor.getColumnIndex("income"));
+			item.strMember = cursor.getString(cursor.getColumnIndex("member"));
+			item.strRemark = cursor.getString(cursor.getColumnIndex("remark"));
+			arrRecordList.add(item);
+		}
 
 		return true;
 	}
@@ -343,15 +387,21 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	}
 
 	// income_bill_type_tab operation
-	public boolean AddBillTypeTab(BillTypes ddt)
+	public boolean AddIncomeBillTypeTab(BillTypes ddt)
 	{
+		if(FindInIncomeBillTypeTab(ddt) != null)
+			return false;
+
 		String sql1 = "select * from income_bill_type_tab";
-		String sql2 = "insert into bill_type_tab (icon_name, icon_bg, icon_id) values(?,?,?)";
+		String sql2 = "insert into income_bill_type_tab (icon_name, icon_bg, icon_id) values(?,?,?)";
 
 		int nCountBefore = 0;
 		Cursor cursor = m_dbRead.rawQuery(sql1, null);
 		if(cursor.moveToFirst())
 			nCountBefore = cursor.getCount();
+
+		int nBillIdRelative = GetIncomeBillIdRelative();
+		ddt.nBillTypeID = nBillIdRelative + 1;
 
 		m_dbWrite.beginTransaction();
 		try
@@ -377,15 +427,16 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			return false;
 		}
 
+		UpdateIncomeBillId(nBillIdRelative, ddt.nBillTypeID);
 		cursor.close();
 		return true;
 	}
 
-	public boolean DeleteInBillTypeTab(BillTypes ddt)
+	public boolean DeleteInIncomeBillTypeTab(BillTypes ddt)
 	{
 		String sql2 = "delete from income_bill_type_tab where icon_id=?";
 
-		if(FindInBillTypeTab(ddt) != null)
+		if(FindInIncomeBillTypeTab(ddt) != null)
 		{
 			m_dbWrite.beginTransaction();
 			try
@@ -398,21 +449,23 @@ public class DBOpenHelper extends SQLiteOpenHelper
 				m_dbWrite.endTransaction();
 			}
 		}
+		else
+			return false;
 
-		if(FindInBillTypeTab(ddt) != null)
+		if(FindInIncomeBillTypeTab(ddt) != null)
 			return false;
 
 		return true;
 	}
 
-	public BillTypes FindInBillTypeTab(BillTypes ddt)
+	public BillTypes FindInIncomeBillTypeTab(BillTypes ddt)
 	{
-		String sql = "select * from income_bill_record where icon_id=?";
+		String sql = "select * from income_bill_type_tab where icon_id=?";
 		Cursor cursor = m_dbRead.rawQuery(sql, new String[]{Integer.toString(ddt.nBillTypeID)});
 		if(cursor.moveToFirst())
 		{
 			BillTypes newddt = new BillTypes();
-			newddt.strName = cursor.getString(cursor.getColumnIndex("timestamp"));
+			newddt.strName = cursor.getString(cursor.getColumnIndex("icon_name"));
 			newddt.strPicture = cursor.getString(cursor.getColumnIndex("icon_bg"));
 			newddt.nBillTypeID = cursor.getInt(cursor.getColumnIndex("icon_id"));
 
@@ -424,13 +477,13 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		return null;
 	}
 
-	public boolean UpdateBillTypeTab(BillTypes ddt)
+	public boolean UpdateIncomeBillTypeTab(BillTypes ddt)
 	{
 		String sql = "update income_bill_type_tab " +
-				"set icon_name=?,icon_bg=?" +
+				"set icon_name=?,icon_bg=? " +
 				"where icon_id=?";
 
-		if(FindInBillTypeTab(ddt) != null)
+		if(FindInIncomeBillTypeTab(ddt) != null)
 			return false;
 
 		m_dbWrite.beginTransaction();
@@ -439,7 +492,8 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			m_dbWrite.execSQL(sql, new Object[]{
 					ddt.strName,
 					ddt.strPicture,
-			});
+					ddt.nBillTypeID
+					});
 			m_dbWrite.setTransactionSuccessful();
 		}
 		finally
@@ -447,9 +501,32 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			m_dbWrite.endTransaction();
 		}
 
-		BillTypes newddt = FindInBillTypeTab(ddt);
+		BillTypes newddt = FindInIncomeBillTypeTab(ddt);
 		if(newddt == null)
 			return false;
+
+		return true;
+	}
+
+	public boolean GetAllIncomeBillType(ArrayList<BillTypes> arrBillTypeList)
+	{
+		arrBillTypeList.clear();
+
+		String sql = "select * from income_bill_record order by timestamp desc";
+		Cursor cursor = m_dbRead.rawQuery(sql, null);
+		if(cursor.moveToFirst() == false)
+			return false;
+
+		int nItemCount = cursor.getCount();
+		for(int i = 0; i < nItemCount; ++i)
+		{
+			BillTypes item = new BillTypes();
+
+			item.strName = cursor.getString(cursor.getColumnIndex("icon_name"));
+			item.strPicture = cursor.getString(cursor.getColumnIndex("icon_bg"));
+			item.nBillTypeID = cursor.getInt(cursor.getColumnIndex("icon_id"));
+			arrBillTypeList.add(item);
+		}
 
 		return true;
 	}
@@ -457,6 +534,9 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	// pay_bill_type_tab operation
 	public boolean AddPayBillTypeTab(BillTypes ddt)
 	{
+		if(FindInPayBillTypeTab(ddt) == null)
+			return false;
+
 		String sql1 = "select * from pay_bill_type_tab";
 		String sql2 = "insert into bill_type_tab (icon_name, icon_bg, icon_id) values(?,?,?)";
 
@@ -464,6 +544,9 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		Cursor cursor = m_dbRead.rawQuery(sql1, null);
 		if(cursor.moveToFirst())
 			nCountBefore = cursor.getCount();
+
+		int nPayBillTypeRelative = GetPayBillIdRelative();
+		ddt.nBillTypeID = nPayBillTypeRelative + 1;
 
 		m_dbWrite.beginTransaction();
 		try
@@ -489,6 +572,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			return false;
 		}
 
+		UpdatePayBillId(nPayBillTypeRelative, ddt.nBillTypeID);
 		cursor.close();
 		return true;
 	}
@@ -497,7 +581,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	{
 		String sql2 = "delete from pay_bill_type_tab where icon_id=?";
 
-		if(FindInBillTypeTab(ddt) != null)
+		if(FindInPayBillTypeTab(ddt) != null)
 		{
 			m_dbWrite.beginTransaction();
 			try
@@ -510,8 +594,10 @@ public class DBOpenHelper extends SQLiteOpenHelper
 				m_dbWrite.endTransaction();
 			}
 		}
+		else
+			return false;
 
-		if(FindInBillTypeTab(ddt) != null)
+		if(FindInPayBillTypeTab(ddt) != null)
 			return false;
 
 		return true;
@@ -551,6 +637,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			m_dbWrite.execSQL(sql, new Object[]{
 					ddt.strName,
 					ddt.strPicture,
+					ddt.nBillTypeID
 					});
 			m_dbWrite.setTransactionSuccessful();
 		}
@@ -559,9 +646,32 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			m_dbWrite.endTransaction();
 		}
 
-		BillTypes newddt = FindInBillTypeTab(ddt);
+		BillTypes newddt = FindInPayBillTypeTab(ddt);
 		if(newddt == null)
 			return false;
+
+		return true;
+	}
+
+	public boolean GetAllPayBillType(ArrayList<BillTypes> arrPayBillTypeList)
+	{
+		arrPayBillTypeList.clear();
+
+		String sql = "select * from pay_bill_record order by timestamp desc";
+		Cursor cursor = m_dbRead.rawQuery(sql, null);
+		if(cursor.moveToFirst() == false)
+			return false;
+
+		int nItemCount = cursor.getCount();
+		for(int i = 0; i < nItemCount; ++i)
+		{
+			BillTypes item = new BillTypes();
+
+			item.strName = cursor.getString(cursor.getColumnIndex("icon_name"));
+			item.strPicture = cursor.getString(cursor.getColumnIndex("icon_bg"));
+			item.nBillTypeID = cursor.getInt(cursor.getColumnIndex("icon_id"));
+			arrPayBillTypeList.add(item);
+		}
 
 		return true;
 	}
@@ -576,6 +686,9 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		Cursor cursor = m_dbRead.rawQuery(sql1, null);
 		if(cursor.moveToFirst())
 			nCountBefore = cursor.getCount();
+
+		int nWalletTypeRelative = GetWalletIdRelative();
+		ddt.nWalletTypeID = nWalletTypeRelative + 1;
 
 		m_dbWrite.beginTransaction();
 		try
@@ -602,6 +715,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			return false;
 		}
 
+		UpdateWalletId(nWalletTypeRelative, ddt.nWalletTypeID);
 		cursor.close();
 		return true;
 	}
@@ -664,7 +778,8 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			m_dbWrite.execSQL(sql, new Object[]{
 					ddt.strName,
 					ddt.strLayoutName,
-					ddt.strColor
+					ddt.strColor,
+					ddt.nWalletTypeID
 			});
 			m_dbWrite.setTransactionSuccessful();
 		}
@@ -680,11 +795,71 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		return true;
 	}
 
+	// member_tab operation
+	public boolean AddMemberTab(String strNewMember)
+	{
+		String sql1 = "select * from member_tab";
+		String sql2 = "insert into member_tab (member_name) values(?)";
+
+		int nCountBefore = 0;
+		Cursor cursor = m_dbRead.rawQuery(sql1, null);
+		if(cursor.moveToFirst())
+			nCountBefore = cursor.getCount();
+
+		m_dbWrite.beginTransaction();
+		try
+		{
+			m_dbWrite.execSQL(sql2, new Object[]{
+					strNewMember
+			});
+			m_dbWrite.setTransactionSuccessful();
+		}
+		finally
+		{
+			m_dbWrite.endTransaction();
+		}
+
+		cursor = m_dbRead.rawQuery(sql1, null);
+		int nCountAfter = cursor.getCount();
+
+		if(nCountBefore >= nCountAfter)
+		{
+			cursor.close();
+			return false;
+		}
+
+		cursor.close();
+		return true;
+	}
+
+	public boolean UpdateMember(String strOldName, String strNewName)
+	{
+		String sql2 = "update member_name " +
+				"set member_name=? " +
+				"where member_name=?";
+
+		m_dbWrite.beginTransaction();
+		try
+		{
+			m_dbWrite.execSQL(sql2, new Object[]{
+					strNewName,
+					strOldName
+			});
+			m_dbWrite.setTransactionSuccessful();
+		}
+		finally
+		{
+			m_dbWrite.endTransaction();
+		}
+
+		return true;
+	}
+
 	// id_relative_tab operation
-	public boolean AddIdRelativeTab(int nBillTypeId, int nWalletTypeId)
+	public boolean AddIdRelativeTab(int nIncomeBillTypeId, int nPayBillTypeId, int nWalletTypeId)
 	{
 		String sql1 = "select * from id_relative_tab";
-		String sql2 = "insert into id_relative_tab (bill_id_relative, wallet_id_relative) values(?,?)";
+		String sql2 = "insert into id_relative_tab (income_bill_id_relative, pay_bill_id_relative, wallet_id_relative) values(?,?,?)";
 
 		int nCountBefore = 0;
 		Cursor cursor = m_dbRead.rawQuery(sql1, null);
@@ -698,7 +873,8 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		try
 		{
 			m_dbWrite.execSQL(sql2, new Object[]{
-					nBillTypeId,
+					nIncomeBillTypeId,
+					nPayBillTypeId,
 					nWalletTypeId
 			});
 			m_dbWrite.setTransactionSuccessful();
@@ -721,11 +897,25 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		return true;
 	}
 
-	public boolean UpdateBillTypeId(int nBillTypeOldId, int nBillTypeId)
+	public int GetIncomeBillIdRelative()
+	{
+		String sql1 = "select * from id_relative_tab";
+
+		int nResult = 0;
+		Cursor cursor = m_dbRead.rawQuery(sql1, null);
+		if(cursor.moveToFirst())
+			nResult = cursor.getInt(cursor.getColumnIndex("income_bill_id_relative"));
+
+		cursor.close();
+		return nResult;
+	}
+
+	public boolean UpdateIncomeBillId(int nIncomeBillTypeOldId, int nIncomeBillTypeId)
 	{
 		String sql1 = "select * from id_relative_tab";
 		String sql2 = "update id_relative_tab " +
-				"set bill_type_id=?";
+				"set income_bill_id_relative=? " +
+				"where income_bill_id_relative=?";
 
 		int nCountBefore = 0;
 		Cursor cursor = m_dbRead.rawQuery(sql1, null);
@@ -739,7 +929,8 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		try
 		{
 			m_dbWrite.execSQL(sql2, new Object[]{
-					nBillTypeId
+					nIncomeBillTypeId,
+					nIncomeBillTypeOldId
 			});
 			m_dbWrite.setTransactionSuccessful();
 		}
@@ -751,21 +942,40 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		return true;
 	}
 
-	public boolean UpdateWalletTypeId(int nBillTypeId)
+	public int GetPayBillIdRelative()
 	{
-		String sql = "update id_relative_tab " +
-				"set wallet_id_relative=?";
+		String sql1 = "select * from id_relative_tab";
 
-		if(FindInBillTypeTab(ddt) != null)
+		int nResult = 0;
+		Cursor cursor = m_dbRead.rawQuery(sql1, null);
+		if(cursor.moveToFirst())
+			nResult = cursor.getInt(cursor.getColumnIndex("pay_bill_id_relative"));
+
+		cursor.close();
+		return nResult;
+	}
+
+	public boolean UpdatePayBillId(int nPayBillTypeOldId, int nPayBillTypeNewId)
+	{
+		String sql1 = "select * from id_relative_tab";
+		String sql2 = "update id_relative_tab " +
+				"set pay_bill_id_relative=? " +
+				"where pay_bill_id_relative=?";
+
+		int nCountBefore = 0;
+		Cursor cursor = m_dbRead.rawQuery(sql1, null);
+		if(cursor.moveToFirst())
+			nCountBefore = cursor.getCount();
+
+		if(nCountBefore != 1)
 			return false;
 
 		m_dbWrite.beginTransaction();
 		try
 		{
-			m_dbWrite.execSQL(sql, new Object[]{
-					ddt.strName,
-					ddt.strPicture,
-					ddt.nBillTypeID
+			m_dbWrite.execSQL(sql2, new Object[]{
+					nPayBillTypeNewId,
+					nPayBillTypeOldId
 			});
 			m_dbWrite.setTransactionSuccessful();
 		}
@@ -774,9 +984,50 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			m_dbWrite.endTransaction();
 		}
 
-		BillTypes newddt = FindInBillTypeTab(ddt);
-		if(newddt == null)
+		return true;
+	}
+
+	public int GetWalletIdRelative()
+	{
+		String sql1 = "select * from id_relative_tab";
+
+		int nResult = 0;
+		Cursor cursor = m_dbRead.rawQuery(sql1, null);
+		if(cursor.moveToFirst())
+			nResult = cursor.getInt(cursor.getColumnIndex("wallet_id_relative"));
+
+		cursor.close();
+		return nResult;
+	}
+
+	public boolean UpdateWalletId(int nWalletOldId, int nWalletNewID)
+	{
+		String sql1 = "select * from id_relative_tab";
+		String sql2 = "update id_relative_tab " +
+				"set wallet_id_relative=? " +
+				"where wallet_id_relative=?";
+
+		int nCountBefore = 0;
+		Cursor cursor = m_dbRead.rawQuery(sql1, null);
+		if(cursor.moveToFirst())
+			nCountBefore = cursor.getCount();
+
+		if(nCountBefore != 1)
 			return false;
+
+		m_dbWrite.beginTransaction();
+		try
+		{
+			m_dbWrite.execSQL(sql2, new Object[]{
+					nWalletNewID,
+					nWalletOldId
+			});
+			m_dbWrite.setTransactionSuccessful();
+		}
+		finally
+		{
+			m_dbWrite.endTransaction();
+		}
 
 		return true;
 	}
