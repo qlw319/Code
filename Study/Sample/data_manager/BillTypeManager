@@ -3,23 +3,39 @@ package project.mynotepad.data_manager;
 import java.util.ArrayList;
 
 import project.mynotepad.common_type.BillTypes;
-
-import static project.mynotepad.datastructs.ControlCenter.GetBillTypes;
+import project.mynotepad.database_manager.SQLiteDatabaseManager;
 
 public class BillTypeManager
 {
-	public static boolean LoadBillType(ArrayList<BillTypes> arrBillTypeList)
+	public static boolean LoadBillType(ArrayList<BillTypes> arrIncomeBillTypeList, ArrayList<BillTypes> arrPayBillTypeList, SQLiteDatabaseManager sqLiteDatabaseManager)
 	{
-		return true;
+		boolean bLoadIncomeResult = sqLiteDatabaseManager.LoadIncomeBillType(arrIncomeBillTypeList);
+		boolean bLoadPayResult = sqLiteDatabaseManager.LoadPayBillType(arrPayBillTypeList);
+		if(bLoadIncomeResult && bLoadPayResult)
+			return true;
+
+		return false;
 	}
 
-	public static boolean ChangeName(int nIndex, String strNewName)
+	public static boolean ChangeName(ArrayList<BillTypes> arrBillTypeList, int nIndex, String strNewName, SQLiteDatabaseManager sqLiteDatabaseManager, boolean bIncome)
 	{
 		if(strNewName == null || strNewName.length() == 0)
 			return false;
 
-		ArrayList<BillTypes> arrBillTypeList = GetBillTypes();
 		if(arrBillTypeList == null || nIndex >= arrBillTypeList.size())
+			return false;
+
+		BillTypes modify = new BillTypes();
+		modify.strName = strNewName;
+		modify.strPicture = arrBillTypeList.get(nIndex).strPicture;
+		modify.nBillTypeID = arrBillTypeList.get(nIndex).nBillTypeID;
+		boolean bResult = false;
+		if(bIncome)
+			bResult = sqLiteDatabaseManager.ModifyAIncomeBillType(modify);
+		else
+			bResult = sqLiteDatabaseManager.ModifyAPayBillType(modify);
+
+		if(bResult == false)
 			return false;
 
 		BillTypes billType = arrBillTypeList.get(nIndex);
@@ -28,13 +44,25 @@ public class BillTypeManager
 		return true;
 	}
 
-	public static boolean ChangePicture(int nIndex, String strNewPicture)
+	public static boolean ChangePicture(ArrayList<BillTypes> arrBillTypeList, int nIndex, String strNewPicture, SQLiteDatabaseManager sqLiteDatabaseManager, boolean bIncome)
 	{
 		if(strNewPicture == null || strNewPicture.length() == 0)
 			return false;
 
-		ArrayList<BillTypes> arrBillTypeList = GetBillTypes();
 		if(arrBillTypeList == null || nIndex >= arrBillTypeList.size())
+			return false;
+
+		BillTypes modify = new BillTypes();
+		modify.strName = arrBillTypeList.get(nIndex).strName;
+		modify.strPicture = strNewPicture;
+		modify.nBillTypeID = arrBillTypeList.get(nIndex).nBillTypeID;
+		boolean bResult = false;
+		if(bIncome)
+			bResult = sqLiteDatabaseManager.ModifyAIncomeBillType(modify);
+		else
+			bResult = sqLiteDatabaseManager.ModifyAPayBillType(modify);
+
+		if(bResult == false)
 			return false;
 
 		BillTypes billType = arrBillTypeList.get(nIndex);
@@ -43,13 +71,25 @@ public class BillTypeManager
 		return true;
 	}
 
-	public static boolean ModifyType(int nIndex, String strNewName, String strNewPicture)
+	public static boolean ModifyType(ArrayList<BillTypes> arrBillTypeList, int nIndex, String strNewName, String strNewPicture, SQLiteDatabaseManager sqLiteDatabaseManager, boolean bIncome)
 	{
 		if(strNewName == null || strNewPicture == null || strNewName.length() == 0 || strNewPicture.length() == 0)
 			return false;
 
-		ArrayList<BillTypes> arrBillTypeList = GetBillTypes();
 		if(arrBillTypeList == null || nIndex >= arrBillTypeList.size())
+			return false;
+
+		BillTypes modify = new BillTypes();
+		modify.strName = strNewName;
+		modify.strPicture = strNewPicture;
+		modify.nBillTypeID = arrBillTypeList.get(nIndex).nBillTypeID;
+		boolean bResult = false;
+		if(bIncome)
+			bResult = sqLiteDatabaseManager.ModifyAIncomeBillType(modify);
+		else
+			bResult = sqLiteDatabaseManager.ModifyAPayBillType(modify);
+
+		if(bResult == false)
 			return false;
 
 		BillTypes billType = arrBillTypeList.get(nIndex);
@@ -59,10 +99,25 @@ public class BillTypeManager
 		return true;
 	}
 
-	public static boolean AddType(BillTypes eNewBillType)
+	public static boolean AddType(ArrayList<BillTypes> arrBillTypeList, BillTypes eNewBillType, SQLiteDatabaseManager sqLiteDatabaseManager, boolean bIncome)
 	{
-		ArrayList<BillTypes> arrBillTypeList = GetBillTypes();
 		if(arrBillTypeList == null)
+			return false;
+
+		for(int i = 0; i < arrBillTypeList.size(); ++i)
+		{
+			BillTypes billTypes = arrBillTypeList.get(i);
+			if(eNewBillType.strName == billTypes.strName && eNewBillType.strPicture == billTypes.strPicture)
+				return false;
+		}
+
+		boolean bResult = false;
+		if(bIncome)
+			bResult = sqLiteDatabaseManager.AddAIncomeBillType(eNewBillType);
+		else
+			bResult = sqLiteDatabaseManager.AddAPayBillType(eNewBillType);
+
+		if(bResult == false)
 			return false;
 
 		arrBillTypeList.add(eNewBillType);
