@@ -22,14 +22,16 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	private static final String DATABASE_NAME = ROOT_PATH + FILEFLAG + FILENAME;
 	private static final int DATABASE_VERSION = 1;
 
-	private SQLiteDatabase m_dbRead;
-	private SQLiteDatabase m_dbWrite;
+	private SQLiteDatabase m_dbRead = null;
+	private SQLiteDatabase m_dbWrite = null;
+	private boolean m_bInitialization = false;
 
 	public DBOpenHelper(Context context)
 	{
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		m_dbRead = getReadableDatabase();
 		m_dbWrite = getWritableDatabase();
+		m_bInitialization = true;
 	}
 
 	public void Release()
@@ -97,6 +99,44 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		{
 			db.endTransaction();
 		}
+
+		InitializationBillRecord();
+		InitializationIncomeBillTypeTab();
+		InitializationPayBillTypeTab();
+		InitializationWalletTypeTab();
+		InitializationMemberTab();
+		InitializationIdRelativeTab();
+	}
+
+	// Initialization bill_record
+	private void InitializationBillRecord()
+	{
+	}
+
+	// Initialization income_bill_type_tab
+	private void InitializationIncomeBillTypeTab()
+	{
+	}
+
+	// Initialization pay_bill_type_tab
+	private void InitializationPayBillTypeTab()
+	{
+	}
+
+	// Initialization wallet_type_tab
+	private void InitializationWalletTypeTab()
+	{
+	}
+
+	// Initialization member_tab
+	private void InitializationMemberTab()
+	{
+	}
+
+	// Initialization id_relative_tab
+	private void InitializationIdRelativeTab()
+	{
+		this.AddIdRelativeTab(0, 0, 0);
 	}
 
 	@Override
@@ -512,7 +552,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	{
 		arrBillTypeList.clear();
 
-		String sql = "select * from income_bill_record order by timestamp desc";
+		String sql = "select * from income_bill_record";
 		Cursor cursor = m_dbRead.rawQuery(sql, null);
 		if(cursor.moveToFirst() == false)
 			return false;
@@ -538,7 +578,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			return false;
 
 		String sql1 = "select * from pay_bill_type_tab";
-		String sql2 = "insert into bill_type_tab (icon_name, icon_bg, icon_id) values(?,?,?)";
+		String sql2 = "insert into pay_bill_type_tab (icon_name, icon_bg, icon_id) values(?,?,?)";
 
 		int nCountBefore = 0;
 		Cursor cursor = m_dbRead.rawQuery(sql1, null);
@@ -657,7 +697,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	{
 		arrPayBillTypeList.clear();
 
-		String sql = "select * from pay_bill_record order by timestamp desc";
+		String sql = "select * from pay_bill_record";
 		Cursor cursor = m_dbRead.rawQuery(sql, null);
 		if(cursor.moveToFirst() == false)
 			return false;
@@ -799,7 +839,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	{
 		arrWalletTypesList.clear();
 
-		String sql = "select * from wallet_type_tab order by wallet_id desc";
+		String sql = "select * from wallet_type_tab";
 		Cursor cursor = m_dbRead.rawQuery(sql, null);
 		if(cursor.moveToFirst() == false)
 			return false;
@@ -901,6 +941,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	}
 
 	// id_relative_tab operation
+	// Initialization id relative
 	public boolean AddIdRelativeTab(int nIncomeBillTypeId, int nPayBillTypeId, int nWalletTypeId)
 	{
 		String sql1 = "select * from id_relative_tab";
