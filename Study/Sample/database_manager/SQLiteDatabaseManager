@@ -130,9 +130,69 @@ public class SQLiteDatabaseManager
 		return m_DBOpenHelper.DeleteInPayBillTypeTab(item);
 	}
 
+	public boolean ModifyAPayBillType(BillTypes item)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.UpdatePayBillTypeTab(item);
+	}
+
 	// wallet type tab operation
 	public boolean LoadAllWalletType(ArrayList<WalletTypes> arrWalletTypeList)
 	{
-		return true;
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.GetAllWalletTypeTab(arrWalletTypeList);
+	}
+
+	public boolean AddAWalletType(WalletTypes walletType)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.AddWalletTypeTab(walletType);
+	}
+
+	public boolean DeleteAWalletType(WalletTypes walletType)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.DeleteInWalletTypeTab(walletType);
+	}
+
+	public boolean ModifyAWalletType(WalletTypes walletType)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.UpdateWalletTypeTab(walletType);
+	}
+
+	// Member type operation
+	public boolean LoadAllMembers(ArrayList<String> arrMemberList)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.GetAllMember(arrMemberList);
+	}
+
+	public boolean AddAMember(String strNewMember)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.AddMemberTab(strNewMember);
+	}
+
+	public boolean ModifyMember(String strOldMember, String strNewMember)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return m_DBOpenHelper.UpdateMember(strOldMember, strNewMember);
 	}
 }
