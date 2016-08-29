@@ -8,16 +8,22 @@ import project.mynotepad.common_type.BillTypes;
 import project.mynotepad.common_type.DateInformation;
 import project.mynotepad.common_type.RecordItemDetails;
 import project.mynotepad.common_type.WalletTypes;
+import project.mynotepad.data_manager.BillTypeManager;
+import project.mynotepad.data_manager.RecordItemDetailManager;
+import project.mynotepad.data_manager.WalletTypeManager;
+import project.mynotepad.database_manager.SQLiteDatabaseManager;
 
 public class ControlCenter
 {
 	private static Context mContext;
 	private static boolean m_bInitialization = false;
+	private static SQLiteDatabaseManager m_SQLiteManager = null;
 	private static ArrayList<String> m_arrMemberTypes = null;
 	private static ArrayList<WalletTypes> m_arrWalletTypes = null;
-	private static ArrayList<BillTypes> m_arrBillTypes = null;
-	private static ArrayList<RecordItemDetails> m_arrRecordItemDetails;
-	private static ArrayList<DateInformation> m_arrDateInformation;
+	private static ArrayList<BillTypes> m_arrIncomeBillTypes = null;
+	private static ArrayList<BillTypes> m_arrPayBillTypes = null;
+	private static ArrayList<RecordItemDetails> m_arrRecordItemDetails = null;
+	private static ArrayList<DateInformation> m_arrDateInformation = null;
 
 	public static boolean Initialization(Context context)
 	{
@@ -26,10 +32,17 @@ public class ControlCenter
 
 		m_bInitialization = true;
 		mContext = context;
+		m_SQLiteManager = new SQLiteDatabaseManager(mContext);
 		m_arrMemberTypes = new ArrayList<>();
 		m_arrWalletTypes = new ArrayList<>();
-		m_arrBillTypes = new ArrayList<>();
+		m_arrIncomeBillTypes = new ArrayList<>();
+		m_arrPayBillTypes = new ArrayList<>();
 		m_arrRecordItemDetails = new ArrayList<>();
+
+		m_SQLiteManager.LoadAllMembers(m_arrMemberTypes);
+		WalletTypeManager.LoadWalletType(m_arrWalletTypes, m_SQLiteManager);
+		BillTypeManager.LoadBillType(m_arrIncomeBillTypes, m_arrPayBillTypes, m_SQLiteManager);
+		RecordItemDetailManager.LoadRecordItem(m_arrRecordItemDetails, m_SQLiteManager);
 		return true;
 	}
 
@@ -39,15 +52,20 @@ public class ControlCenter
 			return false;
 
 		m_bInitialization = false;
+		m_SQLiteManager.Release();
 		m_arrMemberTypes.clear();
 		m_arrWalletTypes.clear();
-		m_arrBillTypes.clear();
+		m_arrIncomeBillTypes.clear();
+		m_arrPayBillTypes.clear();
 		m_arrRecordItemDetails.clear();
 		return true;
 	}
 
 	public static ArrayList<String> GetMemberTypes()
 	{
+		if(m_bInitialization == false)
+			return null;
+
 		return m_arrMemberTypes;
 	}
 
@@ -68,21 +86,66 @@ public class ControlCenter
 
 	public static ArrayList<WalletTypes> GetWalletTypes()
 	{
+		if(m_bInitialization == false)
+			return null;
+
 		return m_arrWalletTypes;
 	}
 
-	public static ArrayList<BillTypes> GetBillTypes()
+	public static ArrayList<BillTypes> GetIncomeBillTypes()
 	{
-		return m_arrBillTypes;
+		if(m_bInitialization == false)
+			return null;
+
+		return m_arrIncomeBillTypes;
+	}
+
+	public static ArrayList<BillTypes> GetPayBillTypes()
+	{
+		if(m_bInitialization == false)
+			return null;
+
+		return m_arrPayBillTypes;
 	}
 
 	public static ArrayList<RecordItemDetails> GetRecordItemDetails()
 	{
+		if(m_bInitialization == false)
+			return null;
+
 		return m_arrRecordItemDetails;
 	}
 
 	public static ArrayList<DateInformation> GetDateInfo()
 	{
+		if(m_bInitialization == false)
+			return null;
+
 		return m_arrDateInformation;
+	}
+
+	// record item operation
+	public static boolean AddARecordItem(RecordItemDetails eItem)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return RecordItemDetailManager.AddRecordItem(eItem, m_SQLiteManager);
+	}
+
+	public static boolean DeleteARecordItem(RecordItemDetails eItem)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return RecordItemDetailManager.DeleteRecordItem(eItem, m_SQLiteManager);
+	}
+
+	public static boolean ModifyRecordItem(RecordItemDetails eItem)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		return RecordItemDetailManager.ModifyRecordItem(eItem, m_SQLiteManager);
 	}
 }
