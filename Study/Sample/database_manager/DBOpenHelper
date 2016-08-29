@@ -72,7 +72,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 				"    wallet_name TEXT	NOT NULL" +
 				"  wallet_layout TEXT	NOT NULL" +
 				"   wallet_color TEXT	NOT NULL" +
-				"   wallet_id	 TEXT	NOT NULL);";
+				"   wallet_id	 INT	NOT NULL);";
 
 		String sq5 = "CREATE TABLE member_tab" +
 				"   member_name	 TEXT	NOT NULL);";
@@ -795,6 +795,30 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		return true;
 	}
 
+	public boolean GetAllWalletTypeTab(ArrayList<WalletTypes> arrWalletTypesList)
+	{
+		arrWalletTypesList.clear();
+
+		String sql = "select * from wallet_type_tab order by wallet_id desc";
+		Cursor cursor = m_dbRead.rawQuery(sql, null);
+		if(cursor.moveToFirst() == false)
+			return false;
+
+		int nItemCount = cursor.getCount();
+		for(int i = 0; i < nItemCount; ++i)
+		{
+			WalletTypes item = new WalletTypes();
+
+			item.strName = cursor.getString(cursor.getColumnIndex("wallet_name"));
+			item.strLayoutName = cursor.getString(cursor.getColumnIndex("wallet_layout"));
+			item.strColor = cursor.getString(cursor.getColumnIndex("wallet_color"));
+			item.nWalletTypeID = cursor.getInt(cursor.getColumnIndex("wallet_id"));
+			arrWalletTypesList.add(item);
+		}
+
+		return true;
+	}
+
 	// member_tab operation
 	public boolean AddMemberTab(String strNewMember)
 	{
@@ -850,6 +874,27 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		finally
 		{
 			m_dbWrite.endTransaction();
+		}
+
+		return true;
+	}
+
+	public boolean GetAllMember(ArrayList<String> arrMemberList)
+	{
+		arrMemberList.clear();
+
+		String sql = "select * from member_tab";
+		Cursor cursor = m_dbRead.rawQuery(sql, null);
+		if(cursor.moveToFirst() == false)
+			return false;
+
+		int nItemCount = cursor.getCount();
+		for(int i = 0; i < nItemCount; ++i)
+		{
+			String item = new String();
+
+			item = cursor.getString(cursor.getColumnIndex("member_name"));
+			arrMemberList.add(item);
 		}
 
 		return true;
