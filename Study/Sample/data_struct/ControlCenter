@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import project.mynotepad.common_type.BillTypes;
 import project.mynotepad.common_type.DateInformation;
-import project.mynotepad.common_type.MemberType;
 import project.mynotepad.common_type.RecordItemDetails;
 import project.mynotepad.common_type.WalletTypes;
 
@@ -14,7 +13,7 @@ public class ControlCenter
 {
 	private static Context mContext;
 	private static boolean m_bInitialization = false;
-	private static ArrayList<MemberType> m_arrMemberTypes = null;
+	private static ArrayList<String> m_arrMemberTypes = null;
 	private static ArrayList<WalletTypes> m_arrWalletTypes = null;
 	private static ArrayList<BillTypes> m_arrBillTypes = null;
 	private static ArrayList<RecordItemDetails> m_arrRecordItemDetails;
@@ -47,9 +46,24 @@ public class ControlCenter
 		return true;
 	}
 
-	public static ArrayList<MemberType> GetMemberTypes()
+	public static ArrayList<String> GetMemberTypes()
 	{
 		return m_arrMemberTypes;
+	}
+
+	public static boolean AddMemberTypes(String strNewMember)
+	{
+		if(m_bInitialization == false)
+			return false;
+
+		for(int i = 0; i < m_arrMemberTypes.size(); ++i)
+		{
+			if(m_arrMemberTypes.get(i) == strNewMember)
+				return false;
+		}
+
+		m_arrMemberTypes.add(strNewMember);
+		return true;
 	}
 
 	public static ArrayList<WalletTypes> GetWalletTypes()
