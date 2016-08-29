@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import project.mynotepad.common_type.IncomeAndPay;
 import project.mynotepad.common_type.RecordItemDetails;
+import project.mynotepad.database_manager.SQLiteDatabaseManager;
 import project.mynotepad.datastructs.ControlCenter;
 
 import static project.mynotepad.data_manager.DateInforManager.GetSpecifyDayIncomeAndPay;
@@ -11,23 +12,33 @@ import static project.mynotepad.data_manager.DateInforManager.GetSpecifyDayIncom
 public class RecordItemDetailManager
 {
 	// 从数据库中把数据导入内存
-	public static boolean LoadRecordItem(ArrayList<RecordItemDetails> arrRecordItemDetailsList)
+	public static boolean LoadRecordItem(ArrayList<RecordItemDetails> arrRecordItemDetailsList, SQLiteDatabaseManager sqLiteDatabaseManager)
 	{
-		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
-		if(arrAllRecordList == null)
+		if(arrRecordItemDetailsList == null)
 			return false;
 
-		return true;
+		boolean bLoadResult = sqLiteDatabaseManager.LoadBillRecords(arrRecordItemDetailsList);
+		if(bLoadResult)
+		{
+			OrderItemRecords();
+			DateInforManager.ImportDateInfo();
+		}
+
+		return bLoadResult;
 	}
 
 	// 增加一条记录
-	public static boolean AddRecordItem(RecordItemDetails eNewItem)
+	public static boolean AddRecordItem(RecordItemDetails eNewItem, SQLiteDatabaseManager sqLiteDatabaseManager)
 	{
+		boolean bResult = sqLiteDatabaseManager.AddABillRecord(eNewItem);
+		if(bResult == false)
+			return false;
+
 		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
 		if(arrAllRecordList == null)
 			return false;
 
-		int nIndex = FindRecordItemIndex(eNewItem);
+		int nIndex = FindRecordItemIndex(eNewItem.strTimestamp);
 		if(nIndex == -1)
 		{
 			arrAllRecordList.add(eNewItem);
@@ -35,36 +46,47 @@ public class RecordItemDetailManager
 		}
 		else
 			arrAllRecordList.add(nIndex, eNewItem);
+		DateInforManager.AddSingleRecordItem(eNewItem);
 
 		return true;
 	}
 
 	// 删除一条记录
-	public static boolean DeleteRecordItem(RecordItemDetails eItem)
+	public static boolean DeleteRecordItem(RecordItemDetails eItem, SQLiteDatabaseManager sqLiteDatabaseManager)
 	{
 		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
 		if(arrAllRecordList == null)
 			return false;
 
-		int nIndex = FindRecordItemIndex(eItem);
+		int nIndex = FindRecordItemIndex(eItem.strTimestamp);
 		if(nIndex == -1)
 			return false;
-		else
-			arrAllRecordList.remove(nIndex);
+
+		boolean bResult = sqLiteDatabaseManager.DeleteABillRecord(eItem);
+		if(bResult == false)
+			return false;
+
+		arrAllRecordList.remove(nIndex);
+		DateInforManager.DeleteSingleRecordItem(eItem);
 
 		return true;
 	}
 
 	// 修改一条记录
-	public static boolean ModifyRecordItem(RecordItemDetails eItemBefore, RecordItemDetails eItemModify)
+	public static boolean ModifyRecordItem(RecordItemDetails eItemModify, SQLiteDatabaseManager sqLiteDatabaseManager)
 	{
 		ArrayList<RecordItemDetails> arrAllRecordList = ControlCenter.GetRecordItemDetails();
 		if(arrAllRecordList == null)
 			return false;
 
-		int nIndex = FindRecordItemIndex(eItemBefore);
+		int nIndex = FindRecordItemIndex(eItemModify.strTimestamp);
 		if(nIndex == -1)
 			return false;
+
+		if(sqLiteDatabaseManager.ModifyABillRecord(eItemModify))
+			return false;
+
+		RecordItemDetails eItemBefore = arrAllRecordList.get(nIndex);
 
 		if(eItemBefore.nYear == eItemModify.nYear && eItemBefore.nMonth == eItemModify.nMonth && eItemBefore.nDay == eItemModify.nDay)
 		{
@@ -87,6 +109,7 @@ public class RecordItemDetailManager
 			OrderItemRecords();
 		}
 
+		DateInforManager.ModifySingleRecordItem(eItemBefore, eItemModify);
 		return true;
 	}
 
@@ -239,7 +262,7 @@ public class RecordItemDetailManager
 		return true;
 	}
 
-	public static int FindRecordItemIndex(RecordItemDetails item)
+	public static int FindRecordItemIndex(String strTimestamp)
 	{
 		ArrayList<RecordItemDetails> arrItemRecordsList = ControlCenter.GetRecordItemDetails();
 		if(arrItemRecordsList == null)
@@ -248,7 +271,7 @@ public class RecordItemDetailManager
 		int nIndex = -1;
 		for(int i = 0; i < arrItemRecordsList.size(); ++i)
 		{
-			if(arrItemRecordsList.get(i).strTimestamp == item.strTimestamp)
+			if(arrItemRecordsList.get(i).strTimestamp == strTimestamp)
 				continue;
 
 			nIndex = i;
