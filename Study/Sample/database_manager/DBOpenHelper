@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
+import android.util.Log;
 
 import com.stormbill.stormbill.common_type.BillTypes;
 import com.stormbill.stormbill.common_type.RecordItemDetails;
@@ -26,7 +27,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 
 	private SQLiteDatabase m_dbRead = null;
 	private SQLiteDatabase m_dbWrite = null;
-	private boolean m_bFirstCreateDB = false;
+	private boolean m_bInitForDBFirstCreate = false;
 
 	public DBOpenHelper(Context context)
 	{
@@ -45,8 +46,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	@Override
 	public void onCreate(SQLiteDatabase db)
 	{
-		m_bFirstCreateDB = true;
-		String sql = "CREATE TABLE bill_record (" +
+		String sql = "CREATE TABLE IF NOT EXISTS bill_record (" +
 				"    timestamp DATETIME PRIMARY KEY" +
 				"                       NOT NULL" +
 				"                       DEFAULT CURRENT_TIMESTAMP," +
@@ -62,28 +62,28 @@ public class DBOpenHelper extends SQLiteOpenHelper
 				"    member    TEXT," +
 				"    remark    TEXT );";
 
-		String sq2 = "CREATE TABLE income_bill_type_tab (" +
+		String sq2 = "CREATE TABLE IF NOT EXISTS income_bill_type_tab (" +
 				"    icon_name TEXT     NOT NULL," +
 				"    icon_bg   TEXT     NOT NULL," +
 				"    icon_id   INT      NOT NULL);";
 
-		String sq3 = "CREATE TABLE pay_bill_type_tab (" +
+		String sq3 = "CREATE TABLE IF NOT EXISTS pay_bill_type_tab (" +
 				"    icon_name 		TEXT     NOT NULL," +
 				"    icon_bg   		TEXT     NOT NULL," +
 				"    icon_id  		INT      NOT NULL);";
 
-		String sq4 = "CREATE TABLE wallet_type_tab (" +
+		String sq4 = "CREATE TABLE IF NOT EXISTS wallet_type_tab (" +
 				"    wallet_name 		TEXT	NOT NULL," +
 				"    wallet_layout 		TEXT	NOT NULL," +
 				"    wallet_color 		TEXT	NOT NULL," +
 				"    wallet_id	 		INT	NOT NULL);";
 
-		String sq5 = "CREATE TABLE member_tab (" + "   member_name	 TEXT	NOT NULL);";
+		String sq5 = "CREATE TABLE IF NOT EXISTS member_tab (" + "   member_name	 TEXT	NOT NULL);";
 
-		String sq6 = "CREATE TABLE id_relative_tab (" +
+		String sq6 = "CREATE TABLE IF NOT EXISTS id_relative_tab (" +
 				"  income_bill_id_relative 	INT	NOT NULL," +
 				"  pay_bill_id_relative 	INT	NOT NULL," +
-				"	wallet_id_relative 		INT NOT NULL);";
+				"  wallet_id_relative 		INT NOT NULL);";
 
 		db.beginTransaction();
 		try
@@ -95,16 +95,19 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			db.execSQL(sq5);
 			db.execSQL(sq6);
 			db.setTransactionSuccessful();
+			Log.d("hehe", "onCreate");
 		}
 		finally
 		{
 			db.endTransaction();
 		}
+
+		m_bInitForDBFirstCreate = true;
 	}
 
-	public void InitInforForDBCreate()
+	public void Init()
 	{
-		if(m_bFirstCreateDB == false)
+		if(!m_bInitForDBFirstCreate)
 			return;
 
 		InitializationBillRecord();
@@ -320,7 +323,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 			item.nHour = cursor.getInt(cursor.getColumnIndex("hour"));
 			item.nMinute = cursor.getInt(cursor.getColumnIndex("minute"));
 			item.nBillTypeId = cursor.getInt(cursor.getColumnIndex("billId"));
-			item.nWalletTypeId = cursor.getInt(cursor.getColumnIndex("walletID"));
+			item.nWalletTypeId = cursor.getInt(cursor.getColumnIndex("walletId"));
 			item.dPayMoney = cursor.getDouble(cursor.getColumnIndex("pay"));
 			item.dIncomeMoney = cursor.getDouble(cursor.getColumnIndex("income"));
 			item.strMember = cursor.getString(cursor.getColumnIndex("member"));
@@ -795,7 +798,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 
 	public WalletTypes FindInWalletTypeTab(WalletTypes ddt)
 	{
-		String sql = "select * from wallet_type_tab where wallet_id=?";
+		String sql = "select * from bill_record where wallet_id=?";
 		Cursor cursor = m_dbRead.rawQuery(sql, new String[]{Integer.toString(ddt.nWalletTypeID)});
 		if(cursor.moveToFirst())
 		{
@@ -871,6 +874,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	// member_tab operation
 	public boolean AddMemberTab(String strNewMember)
 	{
+		Log.d("hehe", "AddMemberTab");
 		String sql1 = "select * from member_tab";
 		String sql2 = "insert into member_tab (member_name) values(?)";
 
