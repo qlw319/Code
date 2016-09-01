@@ -1,4 +1,4 @@
-package project.mynotepad.database_manager;
+package com.stormbill.stormbill.database_manager;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,12 +6,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 
+import com.stormbill.stormbill.common_type.BillTypes;
+import com.stormbill.stormbill.common_type.RecordItemDetails;
+import com.stormbill.stormbill.common_type.WalletTypes;
+
 import java.io.File;
 import java.util.ArrayList;
 
-import project.mynotepad.common_type.BillTypes;
-import project.mynotepad.common_type.RecordItemDetails;
-import project.mynotepad.common_type.WalletTypes;
+import static com.stormbill.stormbill.initialization_information.CommonInitInfor.InitMembers;
 
 public class DBOpenHelper extends SQLiteOpenHelper
 {
@@ -24,14 +26,13 @@ public class DBOpenHelper extends SQLiteOpenHelper
 
 	private SQLiteDatabase m_dbRead = null;
 	private SQLiteDatabase m_dbWrite = null;
-	private boolean m_bInitialization = false;
+	private boolean m_bFirstCreateDB = false;
 
 	public DBOpenHelper(Context context)
 	{
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		m_dbRead = getReadableDatabase();
 		m_dbWrite = getWritableDatabase();
-		m_bInitialization = true;
 	}
 
 	public void Release()
@@ -44,6 +45,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	@Override
 	public void onCreate(SQLiteDatabase db)
 	{
+		m_bFirstCreateDB = true;
 		String sql = "CREATE TABLE bill_record (" +
 				"    timestamp DATETIME PRIMARY KEY" +
 				"                       NOT NULL" +
@@ -60,29 +62,28 @@ public class DBOpenHelper extends SQLiteOpenHelper
 				"    member    TEXT," +
 				"    remark    TEXT );";
 
-		String sq2 = "CREATE TABLE income_bill_type_tab" +
+		String sq2 = "CREATE TABLE income_bill_type_tab (" +
 				"    icon_name TEXT     NOT NULL," +
 				"    icon_bg   TEXT     NOT NULL," +
 				"    icon_id   INT      NOT NULL);";
 
-		String sq3 = "CREATE TABLE pay_bill_type_tab" +
-				"    icon_name TEXT     NOT NULL," +
-				"    icon_bg   TEXT     NOT NULL," +
-				"    icon_id   INT      NOT NULL);";
+		String sq3 = "CREATE TABLE pay_bill_type_tab (" +
+				"    icon_name 		TEXT     NOT NULL," +
+				"    icon_bg   		TEXT     NOT NULL," +
+				"    icon_id  		INT      NOT NULL);";
 
-		String sq4 = "CREATE TABLE wallet_type_tab" +
-				"    wallet_name TEXT	NOT NULL" +
-				"  wallet_layout TEXT	NOT NULL" +
-				"   wallet_color TEXT	NOT NULL" +
-				"   wallet_id	 INT	NOT NULL);";
+		String sq4 = "CREATE TABLE wallet_type_tab (" +
+				"    wallet_name 		TEXT	NOT NULL," +
+				"    wallet_layout 		TEXT	NOT NULL," +
+				"    wallet_color 		TEXT	NOT NULL," +
+				"    wallet_id	 		INT	NOT NULL);";
 
-		String sq5 = "CREATE TABLE member_tab" +
-				"   member_name	 TEXT	NOT NULL);";
+		String sq5 = "CREATE TABLE member_tab (" + "   member_name	 TEXT	NOT NULL);";
 
-		String sq6 = "CREATE TABLE id_relative_tab" +
-				"  income_bill_id_relative INT	NOT NULL" +
-				"  pay_bill_id_relative INT	NOT NULL" +
-				"wallet_id_relative INT NOT NULL);";
+		String sq6 = "CREATE TABLE id_relative_tab (" +
+				"  income_bill_id_relative 	INT	NOT NULL," +
+				"  pay_bill_id_relative 	INT	NOT NULL," +
+				"	wallet_id_relative 		INT NOT NULL);";
 
 		db.beginTransaction();
 		try
@@ -99,6 +100,12 @@ public class DBOpenHelper extends SQLiteOpenHelper
 		{
 			db.endTransaction();
 		}
+	}
+
+	public void InitInforForDBCreate()
+	{
+		if(m_bFirstCreateDB == false)
+			return;
 
 		InitializationBillRecord();
 		InitializationIncomeBillTypeTab();
@@ -131,6 +138,8 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	// Initialization member_tab
 	private void InitializationMemberTab()
 	{
+		for(int i = 0; i < InitMembers.length; ++i)
+			AddMemberTab(InitMembers[i]);
 	}
 
 	// Initialization id_relative_tab
@@ -533,7 +542,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 					ddt.strName,
 					ddt.strPicture,
 					ddt.nBillTypeID
-					});
+			});
 			m_dbWrite.setTransactionSuccessful();
 		}
 		finally
@@ -552,7 +561,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	{
 		arrBillTypeList.clear();
 
-		String sql = "select * from income_bill_record";
+		String sql = "select * from income_bill_type_tab";
 		Cursor cursor = m_dbRead.rawQuery(sql, null);
 		if(cursor.moveToFirst() == false)
 			return false;
@@ -678,7 +687,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 					ddt.strName,
 					ddt.strPicture,
 					ddt.nBillTypeID
-					});
+			});
 			m_dbWrite.setTransactionSuccessful();
 		}
 		finally
@@ -697,7 +706,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 	{
 		arrPayBillTypeList.clear();
 
-		String sql = "select * from pay_bill_record";
+		String sql = "select * from pay_bill_type_tab";
 		Cursor cursor = m_dbRead.rawQuery(sql, null);
 		if(cursor.moveToFirst() == false)
 			return false;
@@ -786,7 +795,7 @@ public class DBOpenHelper extends SQLiteOpenHelper
 
 	public WalletTypes FindInWalletTypeTab(WalletTypes ddt)
 	{
-		String sql = "select * from bill_record where wallet_id=?";
+		String sql = "select * from wallet_type_tab where wallet_id=?";
 		Cursor cursor = m_dbRead.rawQuery(sql, new String[]{Integer.toString(ddt.nWalletTypeID)});
 		if(cursor.moveToFirst())
 		{
