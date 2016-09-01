@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class SQLiteDatabaseManager
 {
-	private static DBOpenHelper m_DBOpenHelper = null;
+	private DBOpenHelper m_DBOpenHelper = null;
 	private boolean m_bInitialization = false;
 
 	public SQLiteDatabaseManager(Context context)
@@ -27,7 +27,7 @@ public class SQLiteDatabaseManager
 			return false;
 
 		m_DBOpenHelper = new DBOpenHelper(context);
-		m_DBOpenHelper.InitInforForDBCreate();
+		m_DBOpenHelper.Init();
 		return true;
 	}
 
