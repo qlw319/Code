@@ -1,21 +1,21 @@
-package project.mynotepad.database_manager;
+package com.stormbill.stormbill.database_manager;
 
 import android.content.Context;
 
-import java.util.ArrayList;
+import com.stormbill.stormbill.common_type.BillTypes;
+import com.stormbill.stormbill.common_type.RecordItemDetails;
+import com.stormbill.stormbill.common_type.WalletTypes;
 
-import project.mynotepad.common_type.BillTypes;
-import project.mynotepad.common_type.RecordItemDetails;
-import project.mynotepad.common_type.WalletTypes;
+import java.util.ArrayList;
 
 public class SQLiteDatabaseManager
 {
-	private DBOpenHelper m_DBOpenHelper = null;
+	private static DBOpenHelper m_DBOpenHelper = null;
 	private boolean m_bInitialization = false;
 
 	public SQLiteDatabaseManager(Context context)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return;
 
 		this.Initialization(context);
@@ -23,16 +23,17 @@ public class SQLiteDatabaseManager
 
 	public boolean Initialization(Context context)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		m_DBOpenHelper = new DBOpenHelper(context);
+		m_DBOpenHelper.InitInforForDBCreate();
 		return true;
 	}
 
 	public void Release()
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return;
 
 		m_bInitialization = false;
@@ -42,7 +43,7 @@ public class SQLiteDatabaseManager
 	// Bill record items
 	public boolean LoadBillRecords(ArrayList<RecordItemDetails> arrReocrdList)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.GetAllBillRecords(arrReocrdList);
@@ -50,7 +51,7 @@ public class SQLiteDatabaseManager
 
 	public boolean AddABillRecord(RecordItemDetails item)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.AddBillRecord(item);
@@ -58,7 +59,7 @@ public class SQLiteDatabaseManager
 
 	public boolean DeleteABillRecord(RecordItemDetails item)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.DeleteInBillRecord(item);
@@ -66,7 +67,7 @@ public class SQLiteDatabaseManager
 
 	public boolean ModifyABillRecord(RecordItemDetails item)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.UpdateBillRecord(item);
@@ -75,7 +76,7 @@ public class SQLiteDatabaseManager
 	// income bill type tab operation
 	public boolean LoadIncomeBillType(ArrayList<BillTypes> arrIncomeBillTypeList)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.GetAllIncomeBillType(arrIncomeBillTypeList);
@@ -83,7 +84,7 @@ public class SQLiteDatabaseManager
 
 	public boolean AddAIncomeBillType(BillTypes item)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.AddIncomeBillTypeTab(item);
@@ -91,7 +92,7 @@ public class SQLiteDatabaseManager
 
 	public boolean DeleteAIncomeBillType(BillTypes item)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.DeleteInIncomeBillTypeTab(item);
@@ -99,7 +100,7 @@ public class SQLiteDatabaseManager
 
 	public boolean ModifyAIncomeBillType(BillTypes item)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.UpdateIncomeBillTypeTab(item);
@@ -108,7 +109,7 @@ public class SQLiteDatabaseManager
 	// pay bill type tab operation
 	public boolean LoadPayBillType(ArrayList<BillTypes> arrPayBillTypeList)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.GetAllPayBillType(arrPayBillTypeList);
@@ -116,7 +117,7 @@ public class SQLiteDatabaseManager
 
 	public boolean AddAPayBillType(BillTypes item)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.AddPayBillTypeTab(item);
@@ -124,7 +125,7 @@ public class SQLiteDatabaseManager
 
 	public boolean DeleteAPayBillType(BillTypes item)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.DeleteInPayBillTypeTab(item);
@@ -132,7 +133,7 @@ public class SQLiteDatabaseManager
 
 	public boolean ModifyAPayBillType(BillTypes item)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.UpdatePayBillTypeTab(item);
@@ -141,7 +142,7 @@ public class SQLiteDatabaseManager
 	// wallet type tab operation
 	public boolean LoadAllWalletType(ArrayList<WalletTypes> arrWalletTypeList)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.GetAllWalletTypeTab(arrWalletTypeList);
@@ -149,7 +150,7 @@ public class SQLiteDatabaseManager
 
 	public boolean AddAWalletType(WalletTypes walletType)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.AddWalletTypeTab(walletType);
@@ -157,7 +158,7 @@ public class SQLiteDatabaseManager
 
 	public boolean DeleteAWalletType(WalletTypes walletType)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.DeleteInWalletTypeTab(walletType);
@@ -165,7 +166,7 @@ public class SQLiteDatabaseManager
 
 	public boolean ModifyAWalletType(WalletTypes walletType)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.UpdateWalletTypeTab(walletType);
@@ -174,7 +175,7 @@ public class SQLiteDatabaseManager
 	// Member type operation
 	public boolean LoadAllMembers(ArrayList<String> arrMemberList)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.GetAllMember(arrMemberList);
@@ -182,7 +183,7 @@ public class SQLiteDatabaseManager
 
 	public boolean AddAMember(String strNewMember)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.AddMemberTab(strNewMember);
@@ -190,7 +191,7 @@ public class SQLiteDatabaseManager
 
 	public boolean ModifyMember(String strOldMember, String strNewMember)
 	{
-		if(m_bInitialization == false)
+		if(m_bInitialization)
 			return false;
 
 		return m_DBOpenHelper.UpdateMember(strOldMember, strNewMember);
